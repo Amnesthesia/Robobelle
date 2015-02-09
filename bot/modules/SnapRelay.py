@@ -162,5 +162,6 @@ class SnapRelay(BaseModule):
       now = datetime.now()
       if not self.last_check:
         self.last_check = now
-      elif (now - self.last_check).seconds > 10*60:
+      elif (now - self.last_check).seconds > 7*60:
+        self.last_check = now
         self.download_snaps(self.snapchat_handle, msg)
