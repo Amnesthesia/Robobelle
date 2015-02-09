@@ -71,6 +71,7 @@ class SnapRelay(BaseModule):
       result = cursor.fetchone()[0]
       url = "http://imgur.com/"+result.encode("utf-8")
       link = self.short_url_handle.short(url) if len(url)>75 else url
+      return link
 
 
 
