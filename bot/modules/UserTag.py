@@ -8,7 +8,7 @@ from BaseModule import BaseModule
 
 class UserTag(BaseModule):
 
-    matchers = {"^!tag\s+\w+": "set_tag", "!get": "get_tag", "!set": "set_tag", "!tags": "tag_list", "!taglist": "tag_list"}
+    matchers = {"^!tag\s+\w+": "set_tag", "!get": "get_tag", "!set": "set_tag", "!tags": "tag_list", "!taglist": "tag_list", "!untag": "drop_tag"}
 
     db = sql.connect('bot/modules/databases/usertags')
     db.row_factory = sql.Row
@@ -57,6 +57,13 @@ class UserTag(BaseModule):
       contents = cursor.fetchone()
       if contents:
         msg.reply_handle.msg(msg.author, contents["taglist"].encode('utf-8'))
+
+    def drop_tag(self,msg):
+      """ Unsets a tag """
+      cursor = self.db.cursor()
+      cursor.execute('DELETE FROM tag WHERE tag = ?', (msg.clean_contents,))
+      self.db.commit()
+      msg.reply("Selective Amnesia has been induced. I have no fucking clue what {tag} is...".format(tag=msg.clean_contents))
 
 
 
