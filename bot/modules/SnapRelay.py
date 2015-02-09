@@ -70,8 +70,11 @@ class SnapRelay(BaseModule):
       cursor = self.db.cursor()
       cursor.execute("SELECT COALESCE(GROUP_CONCAT(imgur_id),1) as img FROM snap ORDER BY id DESC")
       result = cursor.fetchone()[0]
+      result = result.split(",")
+      result.reverse()
+      result = ",".join(result)
       url = "http://imgur.com/"+result.encode("utf-8")
-      link = self.short_url_handle.short(url) if len(url)>75 else url
+      link = self.short_url_handle.short(url).encode('utf-8') if len(url)>75 else url
       return link
 
 
