@@ -45,7 +45,8 @@ class SnapRelay(BaseModule):
       Checks for snaps sent to mirabellezzz and posts a link
       """
       msg.reply("Ok give me a second!")
-      return self.download_snaps(self.snapchat_handle, msg)
+      if not self.download_snaps(self.snapchat_handle, msg):
+        msg.reply("I don't have any new snaps :(")
 
 
     def add_friend(self,msg):
@@ -149,10 +150,10 @@ class SnapRelay(BaseModule):
         if snaps_to_imgur:
           cursor.executemany("INSERT INTO snap (imgur_id, author, time) VALUES (?,?,?)",snaps_to_imgur)
           self.db.commit()
+          s.clear_feed()
+          return True
         else:
-          msg.reply("I don't have any new snaps :(")
-
-        s.clear_feed()
+          return False
 
     def initialize_database(self):
       """
