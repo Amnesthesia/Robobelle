@@ -51,7 +51,7 @@ class PreviewTitle(BaseModule):
           msg.reply("[{score}] {title} ({url})".format(score=submission.score, title=submission.title, url=submission.short_link))
       return None
 
-    def get_reddit_preview(url):
+    def get_reddit_preview(self, url):
       submission = self.r.get_submission(url)
       html = markdown(submission.selftext)
       text = ''.join(BeautifulSoup(html).findAll(text=True))
