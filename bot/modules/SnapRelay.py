@@ -25,7 +25,7 @@ class SnapRelay(BaseModule):
     EXTENSIONS = [
         'jpeg',
         'jpg',
-        'mp4'
+        'png'
     ]
 
     def __init__(self, args):
