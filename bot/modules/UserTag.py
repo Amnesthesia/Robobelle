@@ -8,7 +8,7 @@ from BaseModule import BaseModule
 
 class UserTag(BaseModule):
 
-    matchers = {"^!tag": "set_tag", "!get": "get_tag", "!set": "set_tag"}
+    matchers = {"^!tag": "set_tag", "!get": "get_tag", "!set": "set_tag", "!tags": "tag_list", "!taglist": "tag_list"}
 
     db = sql.connect('bot/modules/databases/usertags')
     db.row_factory = sql.Row
@@ -49,6 +49,14 @@ class UserTag(BaseModule):
       cursor.execute('INSERT OR REPLACE INTO "tag" (tag, contents) VALUES (?,?)', (tag, contents))
       self.db.commit()
       msg.reply(random.choice(tag_message))
+
+    def tag_list(self,msg):
+      """ Retrieves a list of tags """
+      cursor = self.db.cursor()
+      cursor.execute('SELECT GROUP_CONCAT(tag) as taglist FROM tag')
+      contents = cursor.fetchone()
+      if contents:
+        msg.reply_handle.msg(msg.author, contents["taglist"])
 
 
 

@@ -1,0 +1,165 @@
+import os
+import sqlite3 as sql
+from snapchat.snapchat import Snapchat
+import pyimgur
+from pyshorteners.shorteners import Shortener
+from ConfigParser import ConfigParser
+from datetime import datetime
+
+from BaseModule import BaseModule
+
+class SnapRelay(BaseModule):
+
+    IMGUR_APP_ID  =  ""
+    SNAPCHAT_USERNAME = ""
+    SNAPCHAT_PASSWORD = ""
+
+    matchers = {"!lastsnap": "latest_snap", "!gallery": "gallery_link", "!friend": "add_friend"}
+    imgur_handle = None
+    snapchat_handle = Snapchat()
+    short_url_handle = Shortener('GoogleShortener')
+    album_id = None
+    db = sql.connect('bot/modules/databases/snap')
+    last_check = None
+    PATH = './snaps/'
+    EXTENSIONS = [
+        'jpeg',
+        'jpg',
+        'mp4'
+    ]
+
+    def __init__(self, args):
+      super(self.__class__,self).__init__(self)
+      self.initialize_database()
+      config = ConfigParser()
+      config.read(["settings.ini"])
+      self.imgur_handle = pyimgur.Imgur(config.get('belle', 'imgur_app_id'))
+      self.IMGUR_APP_ID = config.get('belle', 'imgur_app_id')
+      self.SNAPCHAT_USERNAME = config.get('belle', 'snapchat_username')
+      self.SNAPCHAT_PASSWORD = config.get('belle', 'snapchat_password')
+      self.snapchat_handle.login(self.SNAPCHAT_USERNAME,self.SNAPCHAT_PASSWORD)
+
+
+    def latest_snap(self,msg):
+      """
+      Fetches the most recent snap submission
+      """
+      return self.download_snaps(self.snapchat_handle, msg)
+
+
+    def add_friend(self,msg):
+      """
+      Adds a friend on snapchat
+      """
+      self.snapchat_handle.add_friend(msg.clean_contents)
+      msg.reply("Added!")
+
+    def gallery_link(self,msg):
+      """
+      Gets the link to all snaps
+      """
+      link = self.generate_gallery_link()
+      msg.reply(link)
+
+
+    def generate_gallery_link(self):
+      """
+      Post a link to the imgur gallery
+      """
+      cursor = self.db.cursor()
+      cursor.execute("SELECT COALESCE(GROUP_CONCAT(imgur_id),1) as img FROM snap ORDER BY id DESC")
+      result = cursor.fetchone()[0]
+      url = "http://imgur.com/"+result.encode("utf-8")
+      link = self.short_url_handle.short(url) if len(url)>75 else url
+
+
+
+    def get_downloaded_snaps(self):
+        """Gets the snapchat IDs that have already been downloaded and returns them in a set."""
+
+        result = set()
+
+        for name in os.listdir(self.PATH):
+            print(name)
+            split_name = name.split('.')
+            ext = split_name.pop()
+            filename = ".".join(split_name)
+
+            if ext not in self.EXTENSIONS:
+                continue
+
+            ts, username, id = filename.split('+')
+            result.add(id)
+        return result
+
+    def download_single_snap(self, s, snap):
+        """Download a specific snap, given output from s.get_snaps()."""
+
+        id = snap['id']
+        name = snap['sender']
+        s.add_friend(name)
+        ts = str(snap['sent']).replace(':', '-')
+
+        result = s.get_media(id)
+
+        if not result:
+            print "Result was ", result
+            return False
+
+        ext = s.is_media(result)
+        filename = '{}+{}+{}.{}'.format(ts, name, id, ext)
+        print "Writing to ", filename
+        path = self.PATH + filename
+        with open(path, 'wb') as fout:
+            fout.write(result)
+
+        image = self.imgur_handle.upload_image(path, title="via {user} ({date})".format(user=name, date=datetime.now()), album=self.album_id)
+        return image.link or True
+
+    def download_snaps(self, s, msg):
+        """Download all snaps that haven't already been downloaded."""
+
+        existing = self.get_downloaded_snaps()
+        cursor = self.db.cursor()
+
+        snaps = s.get_snaps()
+        snaps_to_imgur = []
+        for snap in snaps:
+            id = snap['id']
+            if id[-1] == 's' or id in existing:
+                print 'Skipping:', id
+                continue
+
+            result = self.download_single_snap(s, snap)
+
+            if not result:
+                print 'FAILED:', id
+                print result
+            else:
+                msg.reply("{user} just sent me a snap! {url}".format(user=snap['sender'], url=result))
+                imgur_id = result.split("/").pop().split(".").pop(0)
+                snaps_to_imgur.append((imgur_id,snap['sender'],snap['time']))
+                print 'Downloaded:', id
+                print 'Uploading to imgur...'
+        if snaps_to_imgur:
+          cursor.executemany("INSERT INTO snap (imgur_id, author, time) VALUES (?,?,?)",snaps_to_imgur)
+          self.db.commit()
+        s.clear_feed()
+
+    def initialize_database(self):
+      """
+      Sets up the database
+      """
+      cursor = self.db.cursor()
+      cursor.execute('CREATE TABLE IF NOT EXISTS "snap" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "author" text NOT NULL, "imgur_id" TEXT NOT NULL, "time" INTEGER);')
+      self.db.commit()
+
+    def raw(self,msg):
+      """
+      Downloads snaps every 5 minutes as long as the channel is active
+      """
+      now = datetime.now()
+      if not self.last_check:
+        self.last_check = now
+      elif (now - self.last_check).seconds > 10*60:
+        self.download_snaps(self.snapchat_handle, msg)
