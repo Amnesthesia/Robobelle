@@ -141,7 +141,7 @@ class SnapRelay(BaseModule):
                 print 'FAILED:', id
                 print result
             else:
-                msg.reply("{user} just sent me a snap! {url}".format(user=snap['sender'], url=result))
+                msg.reply("{user} just sent me a snap! {url}".format(user=snap['sender'].capitalize(), url=result))
                 imgur_id = result.split("/").pop().split(".").pop(0)
                 snaps_to_imgur.append((imgur_id,snap['sender'],snap['time']))
                 print 'Downloaded:', id

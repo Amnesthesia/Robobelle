@@ -2,6 +2,7 @@ import urllib
 import re
 
 from BaseModule import BaseModule
+from markdown import markdown
 from bs4 import BeautifulSoup
 import praw
 
@@ -56,7 +57,7 @@ class PreviewTitle(BaseModule):
       text = ''.join(BeautifulSoup(html).findAll(text=True))
       amount_lines = 2
 
-      summary = text.split('\n').pop(0)
+      summary = text.split('\n').join(" ")
       summary = (summary[:amount_lines*348] + '...') if len(summary) > 348 else summary
       return summary
 
@@ -69,7 +70,7 @@ class PreviewTitle(BaseModule):
           soup = BeautifulSoup(urllib.urlopen(urls[0]))
           print("Scanned for URLs. Match: {}".format(urls[0]))
           msg.reply("\x02Title: \x02" + soup.title.string.encode('utf-8'))
-          if re.match('http[s]?://[w]{0,3}\.?reddit\.com/\w+/.*', urls[0]) is not None:
+          if re.match('http[s]?://[w]{0,3}\.?reddit\.com/\w+/.*', urls[0]):
             msg.reply(self.get_reddit_preview(urls[0]))
           return
         return None
