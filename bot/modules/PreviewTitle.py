@@ -58,8 +58,8 @@ class PreviewTitle(BaseModule):
       amount_lines = 2
 
       summary = " ".join(text.split('\n'))
-      summary = (summary[:amount_lines*348] + '...') if len(summary) > 348 else summary
-      return summary.encode('utf-8')
+      summary = (summary[:amount_lines*250] + '...') if len(summary) > 250 else summary
+      return "\x02Preview: \x02" + summary.encode('utf-8')
 
 
     def raw(self, msg):
