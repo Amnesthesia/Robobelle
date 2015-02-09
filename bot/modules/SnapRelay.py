@@ -44,6 +44,7 @@ class SnapRelay(BaseModule):
       """
       Checks for snaps sent to mirabellezzz and posts a link
       """
+      msg.reply("Ok give me a second!")
       return self.download_snaps(self.snapchat_handle, msg)
 
 
