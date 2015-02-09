@@ -14,7 +14,7 @@ class SnapRelay(BaseModule):
     SNAPCHAT_USERNAME = ""
     SNAPCHAT_PASSWORD = ""
 
-    matchers = {"!lastsnap": "latest_snap", "!gallery": "gallery_link", "!friend": "add_friend", "!irl": "gallery_link"}
+    matchers = {"!snap": "check_for_snaps", "!gallery": "gallery_link", "!friend": "add_friend", "!irl": "gallery_link"}
     imgur_handle = None
     snapchat_handle = Snapchat()
     short_url_handle = Shortener('GoogleShortener')
@@ -40,16 +40,16 @@ class SnapRelay(BaseModule):
       self.snapchat_handle.login(self.SNAPCHAT_USERNAME,self.SNAPCHAT_PASSWORD)
 
 
-    def latest_snap(self,msg):
+    def check_for_snaps(self,msg):
       """
-      Fetches the most recent snap submission
+      Checks for snaps sent to mirabellezzz and posts a link
       """
       return self.download_snaps(self.snapchat_handle, msg)
 
 
     def add_friend(self,msg):
       """
-      Adds a friend on snapchat
+      Adds a friend on snapchat - add yourself with !friend username to send snaps to mirabellezzz
       """
       self.snapchat_handle.add_friend(msg.clean_contents)
       msg.reply("Added!")
