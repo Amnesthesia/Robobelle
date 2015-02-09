@@ -56,7 +56,7 @@ class UserTag(BaseModule):
       cursor.execute('SELECT GROUP_CONCAT(tag) as taglist FROM tag')
       contents = cursor.fetchone()
       if contents:
-        msg.reply_handle.msg(msg.author, contents["taglist"])
+        msg.reply_handle.msg(msg.author, contents["taglist"].encode('utf-8'))
 
 
 
