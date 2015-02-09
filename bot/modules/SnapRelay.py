@@ -14,7 +14,7 @@ class SnapRelay(BaseModule):
     SNAPCHAT_USERNAME = ""
     SNAPCHAT_PASSWORD = ""
 
-    matchers = {"!lastsnap": "latest_snap", "!gallery": "gallery_link", "!friend": "add_friend"}
+    matchers = {"!lastsnap": "latest_snap", "!gallery": "gallery_link", "!friend": "add_friend", "!irl": "gallery_link"}
     imgur_handle = None
     snapchat_handle = Snapchat()
     short_url_handle = Shortener('GoogleShortener')
