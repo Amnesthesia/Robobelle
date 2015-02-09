@@ -57,7 +57,7 @@ class PreviewTitle(BaseModule):
       text = ''.join(BeautifulSoup(html).findAll(text=True))
       amount_lines = 2
 
-      summary = text.split('\n').join(" ")
+      summary = " ".join(text.split('\n'))
       summary = (summary[:amount_lines*348] + '...') if len(summary) > 348 else summary
       return summary
 
