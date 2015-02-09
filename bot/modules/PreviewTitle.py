@@ -59,7 +59,7 @@ class PreviewTitle(BaseModule):
 
       summary = " ".join(text.split('\n'))
       summary = (summary[:amount_lines*348] + '...') if len(summary) > 348 else summary
-      return summary
+      return summary.encode('utf-8')
 
 
     def raw(self, msg):
