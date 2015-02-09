@@ -146,6 +146,9 @@ class SnapRelay(BaseModule):
         if snaps_to_imgur:
           cursor.executemany("INSERT INTO snap (imgur_id, author, time) VALUES (?,?,?)",snaps_to_imgur)
           self.db.commit()
+        else:
+          msg.reply("I don't have any new snaps :(")
+
         s.clear_feed()
 
     def initialize_database(self):
