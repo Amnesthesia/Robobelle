@@ -215,7 +215,7 @@ class SnapRelay(BaseModule):
 
           if original_clip:
             if original_clip.duration > 10:
-              clip = original_clip.subclip(0,int(original_clip.fps*10))
+              clip = original_clip.subclip(0,(original_clip.fps*10))
             else:
               clip = concatenate_videoclips(list(repeat(original_clip, int(10/original_clip.duration))))
 
@@ -234,7 +234,7 @@ class SnapRelay(BaseModule):
           else:
             msg.reply("Shit, sorry! Something went wrong when I tried to convert your gif to mp4")
         # MP4
-        else:
+      elif extension in ["MP4", "mp4"]:
           snap_vid_id = self.snapchat_handle.upload(Snapchat.MEDIA_VIDEO, self.PATH+"sending/tmp."+extension)
           self.snapchat_handle.send(snap_vid_id, users)
           msg.reply("Sent video to "+",".join(users))
