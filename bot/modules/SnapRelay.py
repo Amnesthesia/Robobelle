@@ -1,4 +1,5 @@
 import os
+from threading import Thread
 import sqlite3 as sql
 from snapchat.snapchat import Snapchat
 import pyimgur
@@ -172,4 +173,4 @@ class SnapRelay(BaseModule):
         self.last_check = now
       elif (now - self.last_check).seconds > 7*60:
         self.last_check = now
-        self.download_snaps(self.snapchat_handle, msg)
+        self.download_snaps(self.snapchat_handle,msg)

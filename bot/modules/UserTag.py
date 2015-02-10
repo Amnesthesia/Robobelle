@@ -8,7 +8,7 @@ from BaseModule import BaseModule
 
 class UserTag(BaseModule):
 
-    matchers = {"^!tag\s+\w+": "set_tag", "!get": "get_tag", "!set": "set_tag", "!tags": "tag_list", "!taglist": "tag_list", "!untag": "drop_tag"}
+    matchers = {"^!tag\s+.+\s+.+": "set_tag", "!get": "get_tag", "!set": "set_tag", "!tags": "tag_list", "!taglist": "tag_list", "!untag": "drop_tag"}
 
     db = sql.connect('bot/modules/databases/usertags')
     db.row_factory = sql.Row
