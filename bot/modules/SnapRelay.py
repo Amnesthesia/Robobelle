@@ -31,6 +31,7 @@ class SnapRelay(BaseModule):
     album_id = None
     db = sql.connect('bot/modules/databases/snap')
     last_check = None
+    ignore_snap_ids = []
     PATH = './snaps/'
     EXTENSIONS = [
         'jpeg',
@@ -151,7 +152,7 @@ class SnapRelay(BaseModule):
         snaps_to_imgur = []
         for snap in snaps:
             id = snap['id']
-            if id[-1] == 's' or id in existing:
+            if id[-1] == 's' or id in existing or id in self.ignore_snap_ids:
                 print 'Skipping:', id
                 continue
 
@@ -159,6 +160,7 @@ class SnapRelay(BaseModule):
 
             if not result:
                 print 'FAILED:', id
+                self.ignore_snap_ids.append(id)
                 print result
             else:
                 if not msg:
@@ -215,16 +217,16 @@ class SnapRelay(BaseModule):
 
           if original_clip:
             if original_clip.duration > 10:
-              clip = original_clip.subclip(0,(original_clip.fps*10))
+              clip = original_clip.subclip(0,10)
             else:
               clip = concatenate_videoclips(list(repeat(original_clip, int(10/original_clip.duration))))
 
             # Rotate mp4 if width > height
             if original_clip.w > original_clip.h:
-              clip.write_videofile(self.PATH+"sending/send.mp4", fps=clip.fps, audio=False, codec="mpeg4", ffmpeg_params=["-vf", "transpose=1"])
+              clip.write_videofile(self.PATH+"sending/send.mp4", fps=original_clip.fps, audio=False, codec="mpeg4", ffmpeg_params=["-vf", "transpose=1"])
               msg.reply("Sorry for the delay, I rotated your {x}x{y} gif and sent it as an mp4!".format(x=clip.w, y=clip.h))
             else:
-              clip.write_videofile(self.PATH+"sending/send.mp4", fps=clip.fps, audio=False, codec="mpeg4")
+              clip.write_videofile(self.PATH+"sending/send.mp4", fps=original_clip.fps, audio=False, codec="mpeg4")
               msg.reply("Sent {x}x{y} gif as mp4!".format(x=clip.w, y=clip.h))
 
 
