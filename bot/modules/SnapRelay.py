@@ -1,5 +1,7 @@
 import os
-from threading import Thread
+import imghdr
+import urllib
+import re
 import sqlite3 as sql
 from snapchat.snapchat import Snapchat
 import pyimgur
@@ -17,7 +19,7 @@ class SnapRelay(BaseModule):
     SNAPCHAT_PASSWORD = ""
     SNAP_CHANNEL = ""
 
-    matchers = {"!snap": "check_for_snaps", "!gallery": "gallery_link", "!friend": "add_friend", "!irl": "gallery_link"}
+    matchers = {"!snap": "send_snap", "!gallery": "gallery_link", "!friend": "add_friend", "!irl": "gallery_link"}
     timer = {"90": "download_snaps"}
     imgur_handle = None
     snapchat_handle = Snapchat()
@@ -170,6 +172,31 @@ class SnapRelay(BaseModule):
           return True
         else:
           return False
+
+    def send_snap(self, msg):
+      """ Sends a snap to a user, arguments being: !send username imgur-link """
+      message = msg.clean_contents.split()
+
+      image_url = message.pop()
+      users = message
+      if not isinstance(users, list):
+        users = [users]
+
+
+      if re.compile('https?://[a-zA-Z0-9\./\-_]+\.(jpg|jpeg)').match(image_url):
+        image = urllib.urlretrieve(image_url, self.PATH+"sending/tmp.jpg")
+        if imghdr.what(self.PATH+"sending/tmp.jpg") not in ["jpg", "jpeg"]:
+          msg.reply("I'm sorry, {user}. I cant let you do that. Only JPEGs supported on Snapchat!".format(user=msg.author))
+        else:
+          snap_img_id = self.snapchat_handle.upload(Snapchat.MEDIA_IMAGE, self.PATH+"sending/tmp.jpg")
+          msg.reply("Alright, sending that picture to {user}".format(user=", ".join(users)))
+          self.snapchat_handle.send(snap_img_id, users)
+
+      else:
+        msg.reply("I don't think {url} is actually a direct link to a jpg/jpeg image :/ I need username, then image-link".format(url=url))
+
+
+
 
     def initialize_database(self):
       """
