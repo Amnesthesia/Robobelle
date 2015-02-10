@@ -422,7 +422,7 @@ class Snapchat(object):
         updates = self.get_updates()
 
         if not updates:
-            return False
+            return []
 
         snaps = updates['updates_response']['snaps']
         result = []

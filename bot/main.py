@@ -13,6 +13,8 @@ class RoboBelle(irc.IRCClient):
 
     def connectionMade(self):
         """Called when a connection is made."""
+        loader = ModuleLoader()
+        loader.reply_handle = self
         self.nickname = self.factory.nick
         self.realname = self.factory.realname
         irc.IRCClient.connectionMade(self)

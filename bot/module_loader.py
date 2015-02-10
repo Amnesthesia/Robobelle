@@ -3,6 +3,7 @@ import os
 import sys
 import re
 import copy
+from twisted.internet import task
 from singleton import Singleton
 
 
@@ -13,6 +14,9 @@ class ModuleLoader(object):
 
     Can be accessed anywhere by ModuleLoader.modules
     """
+    # Reply handle is used to access Robobelle and send messages without
+    # receiving one
+    reply_handle = None
     # Contains instances of each module
     modules = dict({
                     "regex": list(),
@@ -26,6 +30,7 @@ class ModuleLoader(object):
                                     "mode": list(),     # When the mode is changed
                                     "nick": list()   # When a user changed nick
                         }),
+                      "timer": list(),
                       "raw": list()
                     })
     __metaclass__ = Singleton
@@ -45,6 +50,21 @@ class ModuleLoader(object):
         description --  Help message to output when !help command is received
         """
         ModuleLoader.modules["regex"].append(dict({"regex": regex, "module": module, "function": function, "description": description}))
+
+    def register_timer(self, timer, module, function, description):
+        """
+        Registers a function to be run on a module when a message
+        matches the regex.
+
+        :param timer:     Seconds between calls
+        :param module:    Object to run function on
+        :param function:  Function to run
+        :param description:  Help message to output when !help command is received
+        """
+        timer_call = task.LoopingCall(getattr(module,function))
+        timer_call.start(timer)
+        ModuleLoader.modules["timer"].append(dict({"timer": timer, "module": module, "function": function, "description": description, "handle": timer_call}))
+
 
 
     def register_event(self, event, module, function, description):
