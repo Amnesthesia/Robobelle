@@ -1,5 +1,6 @@
 import os
 import imghdr
+from PIL import Image
 import urllib
 import re
 import sqlite3 as sql
@@ -12,11 +13,6 @@ from bot.module_loader import ModuleLoader
 
 from BaseModule import BaseModule
 
-## Fix ICC_PROFILE JPEG issue
-def test_icc_profile_images(h, f):
-    if h.startswith('\xff\xd8') and h[6:17] == b'ICC_PROFILE':
-        return "jpeg"
-imghdr.tests.append(test_icc_profile_images)
 
 class SnapRelay(BaseModule):
 
@@ -179,6 +175,17 @@ class SnapRelay(BaseModule):
         else:
           return False
 
+    def is_jpeg(self, image_path):
+      """Checks if a file is ACTUALLY a jpeg"""
+      if imghdr.what(image_path) not in ["jpg", "jpeg", "JPG", "JPEG"]:
+        i = Image.open(image_path)
+        if i.format in ["jpg", "jpeg", "JPG", "JPEG"]:
+          return True
+        else:
+          return False
+      else:
+        return True
+
     def send_snap(self, msg):
       """ Sends a snap to a user, arguments being: !send username imgur-link """
       message = msg.clean_contents.split()
@@ -191,7 +198,7 @@ class SnapRelay(BaseModule):
 
       if re.compile('https?://[a-zA-Z0-9\./\-_]+\.(jpg|jpeg)').match(image_url):
         image = urllib.urlretrieve(image_url, self.PATH+"sending/tmp.jpg")
-        if imghdr.what(self.PATH+"sending/tmp.jpg") not in ["jpg", "jpeg"]:
+        if not self.is_jpeg(self.PATH+"sending/tmp.jpg"):
           msg.reply("I'm sorry, {user}. I cant let you do that. Only JPEGs supported on Snapchat!".format(user=msg.author))
         else:
           snap_img_id = self.snapchat_handle.upload(Snapchat.MEDIA_IMAGE, self.PATH+"sending/tmp.jpg")
