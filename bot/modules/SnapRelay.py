@@ -24,7 +24,7 @@ class SnapRelay(BaseModule):
     SNAP_CHANNEL = ""
 
     matchers = {"!snap": "send_snap", "!gallery": "gallery_link", "!friend": "add_friend", "!irl": "gallery_link"}
-    timer = {"90": "download_snaps"}
+    timer = {"120": "download_snaps"}
     imgur_handle = None
     snapchat_handle = Snapchat()
     short_url_handle = Shortener('GoogleShortener')
