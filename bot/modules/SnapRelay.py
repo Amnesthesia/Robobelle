@@ -211,20 +211,22 @@ class SnapRelay(BaseModule):
         image_or_video = urllib.urlretrieve(image_url, self.PATH+"sending/tmp."+extension)
 
         if extension in ["gif", "GIF"] and imghdr.what(self.PATH+"sending/tmp."+extension) in ["gif", "GIF"]:
-          clip = VideoFileClip(self.PATH+"sending/tmp."+extension)
+          original_clip = VideoFileClip(self.PATH+"sending/tmp."+extension)
 
-          if clip:
-            if clip.duration > 10:
-              clip = clip.subclip(0,int(clip.fps*10))
+          if original_clip:
+            if original_clip.duration > 10:
+              clip = original_clip.subclip(0,int(original_clip.fps*10))
             else:
-              clip = concatenate_videoclips(list(repeat(clip, int(10/clip.duration))))
+              clip = concatenate_videoclips(list(repeat(original_clip, int(10/original_clip.duration))))
 
             # Rotate mp4 if width > height
-            if clip.w > clip.h:
+            if original_clip.w > original_clip.h:
               clip.write_videofile(self.PATH+"sending/send.mp4", fps=clip.fps, audio=False, codec="mpeg4", ffmpeg_params=["-vf", "transpose=1"])
+              msg.reply("Sorry for the delay, I rotated your {x}x{y} gif and sent it as an mp4!".format(x=clip.w, y=clip.h))
             else:
               clip.write_videofile(self.PATH+"sending/send.mp4", fps=clip.fps, audio=False, codec="mpeg4")
-            msg.reply("GIF sent!")
+              msg.reply("Sent {x}x{y} gif as mp4!".format(x=clip.w, y=clip.h))
+
 
             snap_vid_id = self.snapchat_handle.upload(Snapchat.MEDIA_VIDEO, self.PATH+"sending/send.mp4")
             print("Sending {}".format(snap_vid_id))
