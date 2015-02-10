@@ -218,7 +218,12 @@ class SnapRelay(BaseModule):
               clip = clip.subclip(0,int(clip.fps*10))
             else:
               clip = concatenate_videoclips(list(repeat(clip, int(10/clip.duration))))
-            clip.write_videofile(self.PATH+"sending/send.mp4", fps=clip.fps, audio=False, codec="mpeg4")
+
+            # Rotate mp4 if width > height
+            if clip.w > clip.h:
+              clip.write_videofile(self.PATH+"sending/send.mp4", fps=clip.fps, audio=False, codec="mpeg4", ffmpeg_params=["-vf", "transpose=1"])
+            else:
+              clip.write_videofile(self.PATH+"sending/send.mp4", fps=clip.fps, audio=False, codec="mpeg4")
             msg.reply("GIF sent!")
 
             snap_vid_id = self.snapchat_handle.upload(Snapchat.MEDIA_VIDEO, self.PATH+"sending/send.mp4")
