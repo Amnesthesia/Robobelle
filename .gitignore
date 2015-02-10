@@ -5,5 +5,5 @@
 !*.md
 !requirements
 bot/modules/databases/*
-settings.ini
+./settings.ini
 !**/
