@@ -172,14 +172,3 @@ class SnapRelay(BaseModule):
       cursor = self.db.cursor()
       cursor.execute('CREATE TABLE IF NOT EXISTS "snap" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "author" text NOT NULL, "imgur_id" TEXT NOT NULL, "time" INTEGER);')
       self.db.commit()
-
-    def raw(self,msg):
-      """
-      Downloads snaps every 5 minutes as long as the channel is active
-      """
-      now = datetime.now()
-      if not self.last_check:
-        self.last_check = now
-      elif (now - self.last_check).seconds > 7*60:
-        self.last_check = now
-        self.download_snaps(self.snapchat_handle,msg)
