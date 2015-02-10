@@ -1,6 +1,8 @@
 import os
 import imghdr
 from PIL import Image
+from itertools import repeat
+from moviepy.editor import *
 import urllib
 import re
 import sqlite3 as sql
@@ -204,7 +206,31 @@ class SnapRelay(BaseModule):
           snap_img_id = self.snapchat_handle.upload(Snapchat.MEDIA_IMAGE, self.PATH+"sending/tmp.jpg")
           msg.reply("Alright, sending that picture to {user}".format(user=", ".join(users)))
           self.snapchat_handle.send(snap_img_id, users)
+      elif re.compile('https?://[a-zA-Z0-9\./\-_]+\.(mp4|gif|MP4|GIF)').match(image_url):
+        extension = image_url.split(".").pop()
+        image_or_video = urllib.urlretrieve(image_url, self.PATH+"sending/tmp."+extension)
 
+        if extension in ["gif", "GIF"] and imghdr.what(self.PATH+"sending/tmp."+extension) in ["gif", "GIF"]:
+          clip = VideoFileClip(self.PATH+"sending/tmp."+extension)
+
+          if clip:
+            if clip.duration > 10:
+              clip = clip.subclip(0,int(clip.fps*10))
+            else:
+              clip = concatenate_videoclips(list(repeat(clip, int(10/clip.duration))))
+            clip.write_videofile(self.PATH+"sending/send.mp4", fps=clip.fps, audio=False, codec="mpeg4")
+            msg.reply("GIF sent!")
+
+            snap_vid_id = self.snapchat_handle.upload(Snapchat.MEDIA_VIDEO, self.PATH+"sending/send.mp4")
+            print("Sending {}".format(snap_vid_id))
+            self.snapchat_handle.send(snap_vid_id, users)
+          else:
+            msg.reply("Shit, sorry! Something went wrong when I tried to convert your gif to mp4")
+        # MP4
+        else:
+          snap_vid_id = self.snapchat_handle.upload(Snapchat.MEDIA_VIDEO, self.PATH+"sending/tmp."+extension)
+          self.snapchat_handle.send(snap_vid_id, users)
+          msg.reply("Sent video to "+",".join(users))
       else:
         msg.reply("I don't think {url} is actually a direct link to a jpg/jpeg image :/ I need username, then image-link".format(url=url))
 
