@@ -9,7 +9,7 @@ class Help(BaseModule):
     matchers = {"!help": "help_message", "!more": "more_help", "!commands": "command_list", "!command": "help_command"}
     event = {"join": "say_hi"}
     help = []
-    self.commands = []
+    commands = []
     help_msg = []
 
     def __init__(self, args):
