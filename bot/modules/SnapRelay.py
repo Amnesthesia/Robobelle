@@ -12,6 +12,12 @@ from bot.module_loader import ModuleLoader
 
 from BaseModule import BaseModule
 
+## Fix ICC_PROFILE JPEG issue
+def test_icc_profile_images(h, f):
+    if h.startswith('\xff\xd8') and h[6:17] == b'ICC_PROFILE':
+        return "jpeg"
+imghdr.tests.append(test_icc_profile_images)
+
 class SnapRelay(BaseModule):
 
     IMGUR_APP_ID  =  ""
