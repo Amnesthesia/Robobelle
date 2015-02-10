@@ -23,8 +23,8 @@ class BaseModule(object):
                 log.msg("Module {mod} registered for event {ev} => {func}".format(mod=module.__class__.__name__, ev=event, func=function))
         if hasattr(module,'timer') and len(module.timer):
             for seconds, action in module.timer.items():
-                ModuleLoader.register_timer(loader, int(seconds), module, action, getattr(module, function).__doc__)
-                log.msg("Module {mod} registered for timer {ev}s => {func}".format(mod=module.__class__.__name__, ev=seconds, func=function))
+                ModuleLoader.register_timer(loader, int(seconds), module, action, getattr(module, action).__doc__)
+                log.msg("Module {mod} registered for timer {ev}s => {func}".format(mod=module.__class__.__name__, ev=seconds, func=action))
         if hasattr(module, 'raw'):
           ModuleLoader.register_raw(loader, module, getattr(module,'raw').__doc__)
           log.msg("Module {mod} registered raw message processing => {func}".format(mod=module.__class__.__name__, func=function))

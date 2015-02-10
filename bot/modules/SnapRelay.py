@@ -18,7 +18,7 @@ class SnapRelay(BaseModule):
     SNAP_CHANNEL = ""
 
     matchers = {"!snap": "check_for_snaps", "!gallery": "gallery_link", "!friend": "add_friend", "!irl": "gallery_link"}
-    timer = {"420": "download_snaps"}
+    timer = {"90": "download_snaps"}
     imgur_handle = None
     snapchat_handle = Snapchat()
     short_url_handle = Shortener('GoogleShortener')
@@ -118,11 +118,17 @@ class SnapRelay(BaseModule):
             return False
 
         ext = s.is_media(result)
+
+        if ext not in self.EXTENSIONS:
+          print("Skipping {} snap".format(ext))
+          return False
+
         filename = '{}+{}+{}.{}'.format(ts, name, id, ext)
         print "Writing to ", filename
         path = self.PATH + filename
         with open(path, 'wb') as fout:
             fout.write(result)
+
 
         image = self.imgur_handle.upload_image(path, title="via {user} ({date})".format(user=name, date=datetime.now()), album=self.album_id)
         return image.link or True
