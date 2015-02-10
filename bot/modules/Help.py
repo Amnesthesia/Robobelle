@@ -29,6 +29,7 @@ class Help(BaseModule):
       msg.reply("I've sent my resume your way, {}. For more commands, type !more".format(msg.author))
 
     def command_list(self,msg):
+      """ Gets a list of all commands, no extra information provided """
       msg.notice(", ".join(self.commands)+" - use !command !ud to see more information about that command!")
 
     def more_help(self,msg):
