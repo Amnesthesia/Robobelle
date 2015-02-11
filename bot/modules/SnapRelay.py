@@ -23,7 +23,7 @@ class SnapRelay(BaseModule):
     SNAPCHAT_PASSWORD = ""
     SNAP_CHANNEL = ""
 
-    matchers = {"!snap": "send_snap", "!gallery": "gallery_link", "!friend": "add_friend", "!irl": "gallery_link"}
+    matchers = {"!snap": "send_snap", "!checksnaps": "check_for_snaps", "!gallery": "gallery_link", "!friend": "add_friend", "!irl": "gallery_link"}
     timer = {"120": "download_snaps"}
     imgur_handle = None
     snapchat_handle = Snapchat()
