@@ -59,10 +59,10 @@ class MarkovSpeech(BaseModule):
         i = 0
         sentence = msg.clean_contents.strip().split()
         print(sentence)
-        while len(sentence)<350:
+        while len(sentence)<100:
 
           # This is not pythonic but I had a brainfreeze about boolean operations
-          if (len(sentence)>150 and random.randint(1,12)<5):
+          if (len(sentence.join(" "))>150 and random.randint(1,12)<5):
             break
 
           if i == 0 and not len(sentence):
