@@ -9,12 +9,14 @@ from BaseModule import BaseModule
 class RadioAmnesthesia(BaseModule):
 
     RADIO_STREAM = "http://radio.amnesthesia.com/stream"
+    RADIO_ACTIVE = False
+
     db = sql.connect('bot/modules/databases/radio')
     db.row_factory = sql.Row
     matchers = {"!song": "print_information",
                 "!upvote": "upvote_song",
                 "!downvote": "downvote_song",
-                "!radio": "print_information",
+                "!radio": "on_off_info",
                 "!track": "print_track_info"
                 }
     timer = {"100": "get_metadata"}
@@ -34,6 +36,17 @@ class RadioAmnesthesia(BaseModule):
         config = ConfigParser()
         config.read(["settings.ini"])
         self.CHANNEL = config.get('radio', 'channel')
+
+    def on_off_info(self, msg):
+        """
+        Turn radio information on/off or display info. Arguments: on|off (optional)
+        """
+        if "on" in msg.clean_contents:
+            self.RADIO_ACTIVE = True
+        elif "off" in msg.clean_contents:
+            self.RADIO_ACTIVE = False
+        else:
+            self.print_information(msg)
 
     def print_information(self, msg):
         """
@@ -70,8 +83,8 @@ class RadioAmnesthesia(BaseModule):
                 track = split_title[1].strip()
                 print("Alright, got "+title+" aka "+artist+" / "+track)
                 # If the track has changed, write it in the channel
-                if track != self.current_song:
-                    ModuleLoader().reply_handle.msg(self.CHANNEL, "Now playing: \x02{artist}\x02 - \x02{track}\x02".format(artist=artist, track=track))
+                if track != self.current_song and self.RADIO_ACTIVE:
+                    ModuleLoader().reply_handle.msg(self.CHANNEL, "Now playing: \x02{artist}\x02 - \x02{track}\x02 [url]".format(artist=artist, track=track, url=self.RADIO_STREAM))
                     self.auto_printed = True
                 else:
                     self.auto_printed = False
@@ -81,10 +94,8 @@ class RadioAmnesthesia(BaseModule):
 
                 if artist and track:
                     cursor = self.db.cursor()
-                    print("Trying to insert {artist} and {track}".format(artist=artist, track=track))
                     cursor.execute('INSERT OR IGNORE INTO song (artist, track) VALUES (?, ?)', (artist, track))
                     self.db.commit()
-                    print("Insert didnt throw exception")
                 print(title)
                 return title
             else:
