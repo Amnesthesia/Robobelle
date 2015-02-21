@@ -1,11 +1,8 @@
-from ConfigParser import ConfigParser
-from twisted.application.service import IServiceMaker, Service
+from twisted.application.service import Service
 from twisted.internet.endpoints import clientFromString
-from twisted.plugin import IPlugin
 from twisted.python import usage, log
-from zope.interface import implementer
-from bot.main import RoboBelle
 from bot.factory import RobotFactory
+
 
 class Options(usage.Options):
     # Using Twisted's usage Options
@@ -13,8 +10,10 @@ class Options(usage.Options):
         ['config', 'c', 'settings.ini', 'Configuration file.'],
     ]
 
+
 class RoboBelleService(Service):
-    def __init__(self, endpoint, channels, nick, realname, user, modules, command_prefix):
+    def __init__(self, endpoint, channels, nick, realname, user, modules,
+                 command_prefix):
         self._endpoint = endpoint
         self._channels = channels
         self._nick = nick
@@ -29,12 +28,13 @@ class RoboBelleService(Service):
 
         def connected(bot):
             self._bot = bot
+
         def failure(err):
             log.err(err, _why='Could not connect to specified server')
             reactor.stop()
 
         client = clientFromString(reactor, self._endpoint)
-        factory = RobotFactory({"network" : self._endpoint,
+        factory = RobotFactory({"network": self._endpoint,
                                 "channels": self._channels,
                                 "user": self._user,
                                 "nick": self._nick,
@@ -42,7 +42,7 @@ class RoboBelleService(Service):
                                 "realname": self._realname,
                                 "command_prefix": self._command_prefix})
 
-        return client.connect(factory).addCallbacks(connected,failure)
+        return client.connect(factory).addCallbacks(connected, failure)
 
     def stopService(self):
         """Disconnect"""

@@ -1,4 +1,6 @@
+from bot.main import RoboBelle
 from main import *
+
 
 class RobotFactory(protocol.ClientFactory):
     """ This class inherits IRC protocol stuff
@@ -17,4 +19,5 @@ class RobotFactory(protocol.ClientFactory):
         self.user = settings["user"]
         self.nick = settings["nick"]
         self.command_prefix = settings["command_prefix"]
+        self.modules = settings["modules"]
         self.loader = copy.copy(ModuleLoader())

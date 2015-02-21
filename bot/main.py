@@ -8,6 +8,7 @@ from module_loader import ModuleLoader
 from event import Event
 from message import Message
 
+
 class RoboBelle(irc.IRCClient):
     mods = []
 

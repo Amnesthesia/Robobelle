@@ -59,14 +59,14 @@ class RadioAmnesthesia(BaseModule):
         elif not self.auto_printed:
             msg.reply("Nothing currently playing :(")
 
-
     def get_metadata(self, msg=None):
         """
         Retrieve metadata from the radiostream
 
         :returns: Title of the song / artist playing
         """
-        print("Trying to get metadata ....")
+        if msg == None and not self.RADIO_ACTIVE:
+            return
         request = urllib2.Request(self.RADIO_STREAM)
         try:
             request.add_header('Icy-MetaData', 1)

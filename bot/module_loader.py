@@ -3,6 +3,7 @@ import os
 import sys
 import re
 import copy
+from ConfigParser import ConfigParser
 from twisted.internet import task
 from singleton import Singleton
 
@@ -17,6 +18,8 @@ class ModuleLoader(object):
     # Reply handle is used to access Robobelle and send messages without
     # receiving one
     reply_handle = None
+    # Contains list of enabled modules
+    ENABLED_MODULES = []
     # Contains instances of each module
     modules = dict({
                     "regex": list(),
@@ -36,8 +39,18 @@ class ModuleLoader(object):
     __metaclass__ = Singleton
 
     def __init__(self):
-        ModuleLoader.modules
-        self.load_modules()
+        if not len(self.ENABLED_MODULES):
+            self.parse_module_configuration()
+
+        self.load_modules(self.ENABLED_MODULES)
+
+    def parse_module_configuration(self):
+        """
+        Reads configuration and enables modules
+        """
+        config = ConfigParser()
+        config.read(["settings.ini"])
+        self.ENABLED_MODULES = filter(None, list(module.strip() for module in config.get('belle', 'modules').split('\n')))
 
     def register_regex(self, regex, module, function, description):
         """
@@ -94,12 +107,15 @@ class ModuleLoader(object):
       """
       ModuleLoader.modules["raw"].append(dict({"module": module, "description": description}))
 
-    def load_modules(self):
+    def load_modules(self, enabled_modules=[]):
         """
         Loads all modules and assigns them to indexes in ModuleLoader.modules
 
         Returns dict of module categories
         """
+        if not len(enabled_modules) and len(self.ENABLED_MODULES):
+            enabled_modules = self.ENABLED_MODULES
+
         path = os.path.join(os.path.dirname(__file__), "modules")
         modules = pkgutil.iter_modules(path=[path])
         sys.path.append(path)
@@ -110,14 +126,13 @@ class ModuleLoader(object):
                 # Import module
                 loaded_mod = __import__(mod_name, fromlist=[mod_name])
 
-                # Load class from imported module
-                #s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', mod_name)
-                #file_name = re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
                 loaded_class = getattr(loaded_mod, mod_name)
 
                 # Create an instance of the class
                 # except if it's the BaseModule class
-                if mod_name != "BaseModule":
+                if mod_name != "BaseModule" and mod_name in self.ENABLED_MODULES:
                     instance = loaded_class(mod_name)
-                    #ModuleLoader.modules.append(copy.copy(instance))
-                    #log.msg("Loaded module {}".format(mod_name))
+                    # ModuleLoader.modules.append(copy.copy(instance))
+                    # log.msg("Loaded module {}".format(mod_name))
+                else:
+                    print("Module "+mod_name+" not in "+str(self.ENABLED_MODULES))
