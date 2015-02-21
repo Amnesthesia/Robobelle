@@ -66,7 +66,7 @@ class User(BaseModule):
       greeting = " ".join(split_message)
 
       cursor = self.db.cursor()
-      cursor.execute('INSERT INTO "greeting" (user, message, channel) VALUES (?,?,?)', (user, unicode(greeting), msg.channel))
+      cursor.execute('INSERT INTO "greeting" (user, message, channel) VALUES (?,?,?)', (user, unicode(greeting.decode('utf-8')), msg.channel))
       self.db.commit()
       cursor.execute('SELECT id FROM "greeting" WHERE user=? ORDER BY id DESC LIMIT 1',(user,))
       last_id = cursor.fetchone()

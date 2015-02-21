@@ -47,7 +47,7 @@ class UserTag(BaseModule):
       tag_message= ["Sweet, a word!", "Wow, I love words!", "Words are like scooby-snacks for me <3", "THANKS MAN, THAT'S A COOL TAG. VERY COOL. NO, REALLY."]
 
       cursor = self.db.cursor()
-      cursor.execute('INSERT OR REPLACE INTO "tag" (tag, contents) VALUES (?,?)', (tag, unicode(contents)))
+      cursor.execute('INSERT OR REPLACE INTO "tag" (tag, contents) VALUES (?,?)', (tag, unicode(contents.decode('utf-8'))))
       self.db.commit()
       msg.reply(random.choice(tag_message))
 
