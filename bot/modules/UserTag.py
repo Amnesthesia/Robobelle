@@ -36,6 +36,7 @@ class UserTag(BaseModule):
       else:
         msg.reply("I don't think that tag is set, {sender}".format(sender=msg.author))
 
+
     def set_tag(self, msg):
       """ Set a tag to remember things! I will print it again later if you ask with !get yourtag """
       split_message = msg.clean_contents.split()
@@ -46,9 +47,10 @@ class UserTag(BaseModule):
       tag_message= ["Sweet, a word!", "Wow, I love words!", "Words are like scooby-snacks for me <3", "THANKS MAN, THAT'S A COOL TAG. VERY COOL. NO, REALLY."]
 
       cursor = self.db.cursor()
-      cursor.execute('INSERT OR REPLACE INTO "tag" (tag, contents) VALUES (?,?)', (tag, contents))
+      cursor.execute('INSERT OR REPLACE INTO "tag" (tag, contents) VALUES (?,?)', (tag, unicode(contents)))
       self.db.commit()
       msg.reply(random.choice(tag_message))
+
 
     def tag_list(self,msg):
       """ Retrieves a list of tags """
