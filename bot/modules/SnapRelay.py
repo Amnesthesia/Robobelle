@@ -6,6 +6,7 @@ from moviepy.editor import *
 import urllib
 import re
 import sqlite3 as sql
+import random
 from snapchat.snapchat import Snapchat
 import pyimgur
 from pyshorteners.shorteners import Shortener
@@ -22,6 +23,9 @@ class SnapRelay(BaseModule):
     SNAPCHAT_USERNAME = ""
     SNAPCHAT_PASSWORD = ""
     SNAP_CHANNEL = ""
+
+    # Randomizes timer to timer value + 0..180
+    RANDOM_TIMER = 180
 
     matchers = {"!snap": "send_snap", "!checksnaps": "check_for_snaps", "!gallery": "gallery_link", "!friend": "add_friend", "!irl": "gallery_link"}
     timer = {"120": "download_snaps"}
@@ -175,6 +179,15 @@ class SnapRelay(BaseModule):
           cursor.executemany("INSERT INTO snap (imgur_id, author, time) VALUES (?,?,?)",snaps_to_imgur)
           self.db.commit()
           s.clear_feed()
+
+          if self.RANDOM_TIMER and hasattr(self, 'timer_download_snaps'):
+              timer_download_snaps.stop()
+              time = [key for key, value in d.items() if value == 'download_snaps']
+              if time:
+                  t = int(time.pop())
+                  t += random.randrange(1, self.RANDOM_TIMER)
+                  print("Setting new timer for SnapRelay: "+str(t)+" seconds")
+                  timer_download_snaps.start(t, now=False)
           return True
         else:
           return False

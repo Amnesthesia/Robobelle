@@ -82,7 +82,7 @@ class MarkovSpeech(BaseModule):
         msg.reply(" ".join(sentence))
         return sentence
 
-    def get_word(self,wrd, first=0):
+    def get_word(self, wrd, first=0):
       """
       Retrieve a word from the database. If parameter wrd is not supplied,
       and parameter first is False or 0, this function returns None.
@@ -136,7 +136,7 @@ class MarkovSpeech(BaseModule):
         # Add the words if it doesnt exist
         cursor.executemany("INSERT OR IGNORE INTO word (word) VALUES (?)",words)
 
-        for index,word in enumerate(words):
+        for index, word in enumerate(words):
           if index == 0:
             continue
           if index == 1:

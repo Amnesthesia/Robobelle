@@ -75,6 +75,7 @@ class ModuleLoader(object):
         :param description:  Help message to output when !help command is received
         """
         timer_call = task.LoopingCall(getattr(module,function))
+        setattr(module, 'timer_'+function, timer_call)
         timer_call.start(timer)
         ModuleLoader.modules["timer"].append(dict({"timer": timer, "module": module, "function": function, "description": description, "handle": timer_call}))
 
