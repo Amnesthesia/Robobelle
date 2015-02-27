@@ -125,7 +125,11 @@ class Democracy(BaseModule):
           for row in results:
             response += "\n\x02 [" + str(row["nVotes"]-1) + "]\x02\t" + str(row["list_order"]) + ". " + row["description"]
         elif len(results) is 1:
-          response += "\n\x02 [" + str(results[0]["nVotes"]-1) + "]\x02\t" + str(results[0]["list_order"]) + ". " + results[0]["description"]
+          order = str(results[0]["list_order"]) || "0"
+          desc = results[0]["description"] || "No description"
+          nvotes = str(results[0]["nVotes"]-1) || "0"
+
+          response += "\n\x02 [" + nvotes + "]\x02\t" + order+ ". " + desc
       else:
         response = "Poll not found :("
 
