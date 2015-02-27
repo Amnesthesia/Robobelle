@@ -188,7 +188,8 @@ class Snapchat(object):
         data = {
             'username': username,
             'password': password,
-            'timestamp': timestamp
+            'timestamp': timestamp,
+            'features_map': "[all_updates_friends_response]=1"
         }
 
         params = [
@@ -197,13 +198,22 @@ class Snapchat(object):
         ]
 
         result = self.post('loq/login', data, params)
+
+        result = result.json()
         print(result)
 
-        if 'auth_token' in result:
-            self.auth_token = result['auth_token']
+        if 'auth_token' in result['updates_response']:
+            self.auth_token = result['updates_response']['auth_token']
 
         if 'username' in result:
             self.username = result['username']
+        elif 'username' in result['updates_response']:
+            self.username = result['updates_response']['username']
+
+        print('PRINTING UPDATES RESPONSE')
+        print('===============================================================')
+        print(result['updates_response'])
+        print('===============================================================')
 
         if self.auth_token and self.username:
             self.logged_in = True
