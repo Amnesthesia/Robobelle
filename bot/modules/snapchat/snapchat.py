@@ -199,7 +199,6 @@ class Snapchat(object):
 
         result = self.post('loq/login', data, params)
 
-        result = result.json()
         print(result)
 
         if 'auth_token' in result['updates_response']:
