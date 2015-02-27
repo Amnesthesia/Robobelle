@@ -19,7 +19,7 @@ class Snapchat(object):
     STATIC_TOKEN =          'm198sOkJEn37DjqZ32lpRu76xmw288xSQ9'        # API Static Token
     BLOB_ENCRYPTION_KEY =   'M02cnQ51Ji97vwT4'                          # Blob Encryption Key
     HASH_PATTERN =          '0001110111101110001111010101111011010001001110011000110001000110'; # Hash pattern
-    USERAGENT =             'Snapchat/8.1.1 Beta (Nexus 4; Android 17; gzip)'  # The default useragent
+    USERAGENT =             'Snapchat/8.1.1 (Nexus 4; Android 17; gzip)'  # The default useragent
     SNAPCHAT_VERSION =      '8.1.1'                                     # Snapchat Application Version
 
     MEDIA_IMAGE =                        0  # Media: Image
@@ -155,8 +155,8 @@ class Snapchat(object):
 
         headers = {
             'User-Agent': Snapchat.USERAGENT,
-            'Accept-Language': "en-us, en-gb;q=0.8, en;q=0.7",
-            'Accept-Locale': 'en_US'
+            'Accept-Language': "en",
+            'Accept-Locale': 'en'
         }
 
         url = Snapchat.URL + endpoint
