@@ -412,6 +412,7 @@ class Snapchat(object):
         """Get all events pertaining to the user. (User, Snaps, Friends)."""
 
         if not self.logged_in:
+            print ("Cant get updates because you are not logged in!")
             return False
 
         timestamp = self._timestamp()
@@ -426,6 +427,12 @@ class Snapchat(object):
         ]
 
         result = self.post('loq/all_updates', data, params)
+        if 'auth_token' in result['updates_response']:
+            self.auth_token = result['updates_response']['auth_token']
+
+        print("RECEIVED UPDATES:")
+        print("=============================================================")
+        print(result)
         return result
 
     def get_snaps(self):
@@ -437,11 +444,16 @@ class Snapchat(object):
             print("No new snaps :(")
             return []
 
-        snaps = updates['updates_response']['snaps']
+        #snaps = updates['updates_response']['snaps']
+        allsnaps = []
+        for convo in [convo for convo in updates['conversations_response']]:
+            allsnaps += [_map_keys(snaps) for snaps in convo.get('pending_received_snaps', None)]
+        print("ALL SNAPS: ")
+        print(str(allsnaps))
         result = []
 
         print self._timestamp()
-        for snap in snaps:
+        for snap in allsnaps:
             # Make the fields more readable.
             snap_readable = {
                 'id': self._parse_field(snap, 'id'),
