@@ -312,6 +312,7 @@ class Snapchat(object):
         """
 
         if not self.logged_in:
+            print("NOT LOGGED IN, CANT UPLOAD")
             return False
 
         timestamp = self._timestamp()
@@ -337,7 +338,7 @@ class Snapchat(object):
 
         result = self.post('ph/upload', data, params, encrypted_data)
 
-        if not result:
+        if result:
             print("COULD NOT UPLOAD IMAGE, RESULT WAS ")
             print(result)
             return False
