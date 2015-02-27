@@ -125,9 +125,9 @@ class Democracy(BaseModule):
           for row in results:
             response += "\n\x02 [" + str(row["nVotes"]-1) + "]\x02\t" + str(row["list_order"]) + ". " + row["description"]
         elif len(results) is 1:
-          order = str(results[0]["list_order"]) || "0"
-          desc = results[0]["description"] || "No description"
-          nvotes = str(results[0]["nVotes"]-1) || "0"
+          order = str(results[0]["list_order"]) if str(results[0]["list_order"]) else "0"
+          desc = results[0]["description"] if results[0]["description"]  else "No description"
+          nvotes = str(results[0]["nVotes"]-1)  if str(results[0]["nVotes"]-1) else "0"
 
           response += "\n\x02 [" + nvotes + "]\x02\t" + order+ ". " + desc
       else:
