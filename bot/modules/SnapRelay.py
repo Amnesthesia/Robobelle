@@ -174,9 +174,13 @@ class SnapRelay(BaseModule):
                 snaps_to_imgur.append((imgur_id,snap['sender'],snap['time']))
                 print 'Downloaded:', id
                 print 'Uploading to imgur...'
-                
+
         if self.RANDOM_TIMER and hasattr(self, 'timer_download_snaps'):
-            self.timer_download_snaps.stop()
+            try:
+                self.timer_download_snaps.stop()
+            except:
+                print("Looping call was not running")
+            
             time = [key for key, value in self.timer.items() if value == 'download_snaps']
             if time:
                 t = int(time.pop())
@@ -188,6 +192,7 @@ class SnapRelay(BaseModule):
 
         if snaps_to_imgur:
           cursor.executemany("INSERT INTO snap (imgur_id, author, time) VALUES (?,?,?)",snaps_to_imgur)
+          loader.reply_handle.msg(self.SNAP_CHANNEL, ".. into the gallery with all the others :)")
           self.db.commit()
           s.clear_feed()
 
