@@ -341,6 +341,7 @@ class Snapchat(object):
         """
 
         if not self.logged_in:
+            print("Not logged in!")
             return False
 
         # If we only have one recipient, convert it to a list.
@@ -422,6 +423,7 @@ class Snapchat(object):
         updates = self.get_updates()
 
         if not updates:
+            print("No new snaps :(")
             return []
 
         snaps = updates['updates_response']['snaps']
