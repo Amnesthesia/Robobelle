@@ -14,13 +14,13 @@ if False:
 
 class Snapchat(object):
 
-    URL =                   'https://feelinsonice-hrd.appspot.com/bq'
+    URL =                   'https://feelinsonice-hrd.appspot.com/'
     SECRET =                'iEk21fuwZApXlz93750dmW22pw389dPwOk'        # API Secret
     STATIC_TOKEN =          'm198sOkJEn37DjqZ32lpRu76xmw288xSQ9'        # API Static Token
     BLOB_ENCRYPTION_KEY =   'M02cnQ51Ji97vwT4'                          # Blob Encryption Key
     HASH_PATTERN =          '0001110111101110001111010101111011010001001110011000110001000110'; # Hash pattern
-    USERAGENT =             'Snapchat/6.0.0 (iPhone; iOS 7.0.2; gzip)'  # The default useragent
-    SNAPCHAT_VERSION =      '4.0.0'                                     # Snapchat Application Version
+    USERAGENT =             'Snapchat/8.1.1 Beta (Nexus 4; Android 17; gzip)'  # The default useragent
+    SNAPCHAT_VERSION =      '8.1.1'                                     # Snapchat Application Version
 
     MEDIA_IMAGE =                        0  # Media: Image
     MEDIA_VIDEO =                        1  # Media: Video
@@ -155,8 +155,8 @@ class Snapchat(object):
 
         headers = {
             'User-Agent': Snapchat.USERAGENT,
-            'Accept-Language': "en-us, en-gb;q=0.8, en;q=0.7"
-
+            'Accept-Language': "en-us, en-gb;q=0.8, en;q=0.7",
+            'Accept-Locale': 'en'
         }
 
         url = Snapchat.URL + endpoint
@@ -196,7 +196,7 @@ class Snapchat(object):
             timestamp
         ]
 
-        result = self.post('/login', data, params)
+        result = self.post('loq/login', data, params)
         print(result)
 
         if 'auth_token' in result:
@@ -228,7 +228,7 @@ class Snapchat(object):
             timestamp
         ]
 
-        result = self.post('/logout', data, params)
+        result = self.post('ph/logout', data, params)
         if not result:
             self.logged_in = False
             return True
@@ -324,7 +324,7 @@ class Snapchat(object):
         with open(filename, 'rb') as fin:
             encrypted_data = self._encrypt(fin.read())
 
-        result = self.post('/upload', data, params, encrypted_data)
+        result = self.post('ph/upload', data, params, encrypted_data)
 
         if result:
             return False
@@ -362,7 +362,7 @@ class Snapchat(object):
             timestamp
         ]
 
-        result = self.post('/send', data, params)
+        result = self.post('loq/send', data, params)
         return result != False
 
     def add_story(self, media_id, time=10):
@@ -393,7 +393,7 @@ class Snapchat(object):
             timestamp
         ]
 
-        result = self.post('/post_story', data, params)
+        result = self.post('bq/post_story', data, params)
         return result != False
 
     def get_updates(self):
@@ -413,7 +413,7 @@ class Snapchat(object):
             timestamp
         ]
 
-        result = self.post('/all_updates', data, params)
+        result = self.post('loq/all_updates', data, params)
         return result
 
     def get_snaps(self):
@@ -463,7 +463,7 @@ class Snapchat(object):
             timestamp
         ]
 
-        result = self.post('/stories', data, params)
+        result = self.post('pq/stories', data, params)
 
         return result
 
@@ -490,7 +490,7 @@ class Snapchat(object):
             timestamp
         ]
 
-        result = self.post('/blob', data, params)
+        result = self.post('ph/blob', data, params)
 
         if not result:
             return False
@@ -529,7 +529,7 @@ class Snapchat(object):
             timestamp
         ]
 
-        result = self.post('/find_friends', data, params)
+        result = self.post('bq/find_friends', data, params)
 
         print result
 
@@ -555,7 +555,7 @@ class Snapchat(object):
             timestamp
         ]
 
-        result = self.post('/clear', data, params)
+        result = self.post('clear', data, params)
 
         if not result:
             return True
@@ -577,6 +577,6 @@ class Snapchat(object):
             timestamp
         ]
 
-        self.post('/friend', data, params)
+        self.post('ph/friend', data, params)
 
         return True
