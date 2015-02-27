@@ -181,13 +181,13 @@ class SnapRelay(BaseModule):
           s.clear_feed()
 
           if self.RANDOM_TIMER and hasattr(self, 'timer_download_snaps'):
-              timer_download_snaps.stop()
+              self.timer_download_snaps.stop()
               time = [key for key, value in d.items() if value == 'download_snaps']
               if time:
                   t = int(time.pop())
                   t += random.randrange(1, self.RANDOM_TIMER)
                   print("Setting new timer for SnapRelay: "+str(t)+" seconds")
-                  timer_download_snaps.start(t, now=False)
+                  self.timer_download_snaps.start(t, now=False)
           else:
               print("I should set a random timer, but RANDOM_TIMER is "+str(self.RANDOM_TIMER)+" and timer_download_snaps: "+str(hasattr(self, 'timer_download_snaps')))
           return True
