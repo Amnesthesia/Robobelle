@@ -246,6 +246,8 @@ class MarkovSpeech(BaseModule):
                     # If break_chance is low, chances are it wont break
                     if break_chance > random.randrange(1,100):
                         break
+                else:
+                    break
 
             # Build query to pick out words
             queries = []
