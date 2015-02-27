@@ -447,29 +447,31 @@ class Snapchat(object):
         #snaps = updates['updates_response']['snaps']
         allsnaps = []
         for convo in [convo for convo in updates['conversations_response']]:
-            allsnaps += [_map_keys(snaps) for snaps in convo.get('pending_received_snaps', None)]
+            allsnaps += [self.map_keys(snaps) for snaps in convo.['pending_received_snaps'] ]
         print("ALL SNAPS: ")
         print(str(allsnaps))
         result = []
 
-        print self._timestamp()
-        for snap in allsnaps:
-            # Make the fields more readable.
-            snap_readable = {
-                'id': self._parse_field(snap, 'id'),
-                'media_id': self._parse_field(snap, 'c_id'),
-                'media_type': self._parse_field(snap, 'm'),
-                'time': self._parse_field(snap, 't'),
-                'sender': self._parse_field(snap, 'sn'),
-                'recipient': self._parse_field(snap, 'rp'),
-                'status': self._parse_field(snap, 'st'),
-                'screenshot_count': self._parse_field(snap, 'c'),
-                'sent': self._parse_datetime(snap['sts']),
-                'opened': self._parse_datetime(snap['ts'])
-            }
-            result.append(snap_readable)
+        #print self._timestamp()
 
-        return result
+
+
+        return allsnaps
+
+    def map_keys(snap):
+        snap_readable = {
+            'id': self._parse_field(snap, 'id'),
+            'media_id': self._parse_field(snap, 'c_id'),
+            'media_type': self._parse_field(snap, 'm'),
+            'time': self._parse_field(snap, 't'),
+            'sender': self._parse_field(snap, 'sn'),
+            'recipient': self._parse_field(snap, 'rp'),
+            'status': self._parse_field(snap, 'st'),
+            'screenshot_count': self._parse_field(snap, 'c'),
+            'sent': self._parse_datetime(snap['sts']),
+            'opened': self._parse_datetime(snap['ts'])
+        }
+        return snap_readable
 
     def get_stories(self):
         """Get all stories."""
