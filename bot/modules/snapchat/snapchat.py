@@ -447,7 +447,7 @@ class Snapchat(object):
         #snaps = updates['updates_response']['snaps']
         allsnaps = []
         for convo in [convo for convo in updates['conversations_response']]:
-            allsnaps += [self.map_keys(snaps) for snaps in convo.['pending_received_snaps'] ]
+            allsnaps += [self.map_keys(snaps) for snaps in convo['pending_received_snaps'] ]
         print("ALL SNAPS: ")
         print(str(allsnaps))
         result = []
