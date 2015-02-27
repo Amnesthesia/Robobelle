@@ -78,7 +78,7 @@ class MarkovSpeech(BaseModule):
             return
         else:
             t = time.split('-')
-            if len(t) < 2:
+            if len(t) < 2 or not isinstance(t, list):
                 msg.reply("You gotta give me a time interval! Like 10-50 ... Yes, I'm THIS bad at social interaction.. At least I'm in the right place")
                 return
             else:
@@ -100,11 +100,13 @@ class MarkovSpeech(BaseModule):
                 return self.auto_speak(msg)
 
         if self.auto_talk and hasattr(self, 'timer_auto_speak'):
-            self.timer_auto_speak.stop()
+            try:
+                self.timer_auto_speak.stop()
+            except:
+                print("Looping Call was not running, starting it ...")
             t = random.randrange(int(self.interval[0]), int(self.interval[1]))
             print("Setting new timer for MarkovSpeech.auto_speak: "+str(t)+" seconds")
             self.timer_auto_speak.start(t, now=False)
-
 
 
     def generate_sentence(self,msg):
@@ -228,7 +230,7 @@ class MarkovSpeech(BaseModule):
         sequence_list = []
         pair_id = cursor.fetchone()
         if not pair_id:
-            print("Found no pairs :/")
+            return "I don't know where to start :x"
 
         if pair_id:
             sequence_list.append(pair_id["first_pair"])
@@ -264,7 +266,6 @@ class MarkovSpeech(BaseModule):
             query = " UNION ".join(queries)
 
             query = "SELECT word, ordr FROM ({q}) ORDER BY ordr ASC".format(q=query)
-            print(query)
             cursor.execute(query)
 
             rows = cursor.fetchall()
@@ -309,5 +310,8 @@ class MarkovSpeech(BaseModule):
             else:
                 self.pair_the_pairs(last_pair_id, this_pair_id, 0, 0)
             last_pair_id = this_pair_id
+          elif index == len(words)-1:
+            this_pair_id = self.insert_word_pair(words[index][0],".",0)
+            self.pair_the_pairs(last_pair_id, this_pair_id, 0, 1)
           else:
             last_paid_id = self.insert_word_pair(words[index-1][0],words[index][0],0)
