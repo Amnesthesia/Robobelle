@@ -340,7 +340,7 @@ class Snapchat(object):
         with open(filename, 'rb') as fin:
             encrypted_data = self._encrypt(fin.read())
 
-        result = self.post('ph/upload', data, params, encrypted_data)
+        result = self.post('bq/upload', data, params, encrypted_data)
 
         if result:
             print("COULD NOT UPLOAD IMAGE, RESULT WAS ")
