@@ -338,6 +338,8 @@ class Snapchat(object):
         result = self.post('ph/upload', data, params, encrypted_data)
 
         if result:
+            print("COULD NOT UPLOAD IMAGE, RESULT WAS ")
+            print(result)
             return False
         return media_id
 
@@ -375,6 +377,8 @@ class Snapchat(object):
         ]
 
         result = self.post('loq/send', data, params)
+        print("Tried to send media, result was ")
+        print(result)
         return result != False
 
     def add_story(self, media_id, time=10):
@@ -430,9 +434,9 @@ class Snapchat(object):
         if 'auth_token' in result['updates_response']:
             self.auth_token = result['updates_response']['auth_token']
 
-        print("RECEIVED UPDATES:")
-        print("=============================================================")
-        print(result)
+        #print("RECEIVED UPDATES:")
+        #print("=============================================================")
+        #print(result)
         return result
 
     def get_snaps(self):
@@ -448,8 +452,8 @@ class Snapchat(object):
         allsnaps = []
         for convo in [convo for convo in updates['conversations_response']]:
             allsnaps += [self.map_keys(snaps) for snaps in convo['pending_received_snaps'] ]
-        print("ALL SNAPS: ")
-        print(str(allsnaps))
+        #print("ALL SNAPS: ")
+        #print(str(allsnaps))
         result = []
 
         #print self._timestamp()
