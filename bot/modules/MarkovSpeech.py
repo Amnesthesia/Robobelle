@@ -117,7 +117,7 @@ class MarkovSpeech(BaseModule):
 
       self.db.commit()
 
-    def insert_word_pair(self, first,second,first_pair=False):
+    def insert_word_pair(self, first,second,first_pair=0):
       cursor = self.db.cursor()
 
 

@@ -328,6 +328,9 @@ class Snapchat(object):
             'features_map': {}
         }
 
+        print("Trying to upload:")
+        print(data)
+
         params = [
             self.auth_token,
             timestamp
@@ -343,6 +346,8 @@ class Snapchat(object):
             print("COULD NOT UPLOAD IMAGE, RESULT WAS ")
             print(result)
             return False
+        else:
+            print(result)
         return media_id
 
     def send(self, media_id, recipients, time=10):
@@ -367,12 +372,11 @@ class Snapchat(object):
 
         data = {
             'media_id': media_id,
-            'recipients': ','.join(recipients),
+            'recipient': ','.join(recipients),
             'time': time,
             'timestamp': timestamp,
             'username': self.username,
-            'zipped': 0,
-            'features_map': {}
+            'zipped': 0
         }
 
         params = [
