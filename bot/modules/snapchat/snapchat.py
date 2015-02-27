@@ -367,7 +367,7 @@ class Snapchat(object):
 
         data = {
             'media_id': media_id,
-            'recipient': ','.join(recipients),
+            'recipients': ','.join(recipients),
             'time': time,
             'timestamp': timestamp,
             'username': self.username,
