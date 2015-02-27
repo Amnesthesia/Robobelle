@@ -458,7 +458,7 @@ class Snapchat(object):
 
         return allsnaps
 
-    def map_keys(snap):
+    def map_keys(self, snap):
         snap_readable = {
             'id': self._parse_field(snap, 'id'),
             'media_id': self._parse_field(snap, 'c_id'),
