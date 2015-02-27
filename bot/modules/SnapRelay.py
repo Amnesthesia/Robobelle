@@ -102,7 +102,6 @@ class SnapRelay(BaseModule):
         result = set()
 
         for name in os.listdir(self.PATH):
-            print(name)
             split_name = name.split('.')
             ext = split_name.pop()
             filename = ".".join(split_name)
@@ -175,21 +174,23 @@ class SnapRelay(BaseModule):
                 snaps_to_imgur.append((imgur_id,snap['sender'],snap['time']))
                 print 'Downloaded:', id
                 print 'Uploading to imgur...'
+                
+        if self.RANDOM_TIMER and hasattr(self, 'timer_download_snaps'):
+            self.timer_download_snaps.stop()
+            time = [key for key, value in self.timer.items() if value == 'download_snaps']
+            if time:
+                t = int(time.pop())
+                t += random.randrange(1, self.RANDOM_TIMER)
+                print("Setting new timer for SnapRelay: "+str(t)+" seconds")
+                self.timer_download_snaps.start(t, now=False)
+        else:
+            print("I should set a random timer, but RANDOM_TIMER is "+str(self.RANDOM_TIMER)+" and timer_download_snaps: "+str(hasattr(self, 'timer_download_snaps')))
+
         if snaps_to_imgur:
           cursor.executemany("INSERT INTO snap (imgur_id, author, time) VALUES (?,?,?)",snaps_to_imgur)
           self.db.commit()
           s.clear_feed()
 
-          if self.RANDOM_TIMER and hasattr(self, 'timer_download_snaps'):
-              self.timer_download_snaps.stop()
-              time = [key for key, value in self.timer.items() if value == 'download_snaps']
-              if time:
-                  t = int(time.pop())
-                  t += random.randrange(1, self.RANDOM_TIMER)
-                  print("Setting new timer for SnapRelay: "+str(t)+" seconds")
-                  self.timer_download_snaps.start(t, now=False)
-          else:
-              print("I should set a random timer, but RANDOM_TIMER is "+str(self.RANDOM_TIMER)+" and timer_download_snaps: "+str(hasattr(self, 'timer_download_snaps')))
           return True
         else:
           return False
