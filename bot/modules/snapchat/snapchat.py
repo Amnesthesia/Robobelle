@@ -337,7 +337,7 @@ class Snapchat(object):
 
         result = self.post('ph/upload', data, params, encrypted_data)
 
-        if result:
+        if not result:
             print("COULD NOT UPLOAD IMAGE, RESULT WAS ")
             print(result)
             return False
