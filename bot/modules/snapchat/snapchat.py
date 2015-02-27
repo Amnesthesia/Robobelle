@@ -156,7 +156,7 @@ class Snapchat(object):
         headers = {
             'User-Agent': Snapchat.USERAGENT,
             'Accept-Language': "en-us, en-gb;q=0.8, en;q=0.7",
-            'Accept-Locale': 'en'
+            'Accept-Locale': 'en_US'
         }
 
         url = Snapchat.URL + endpoint
@@ -324,7 +324,8 @@ class Snapchat(object):
             'media_id': media_id,
             'type': type,
             'timestamp': timestamp,
-            'username': self.username
+            'username': self.username,
+            'features_map': {}
         }
 
         params = [
@@ -369,7 +370,9 @@ class Snapchat(object):
             'recipient': ','.join(recipients),
             'time': time,
             'timestamp': timestamp,
-            'username': self.username
+            'username': self.username,
+            'zipped': 0,
+            'features_map': {}
         }
 
         params = [
