@@ -63,7 +63,7 @@ class MarkovSpeech(BaseModule):
         sentence = self.generate_sane_sentence(msg)
         if sentence:
             msg.reply(sentence)
-        elif random.rand(1,2):
+        elif random.randrange(1,2):
             return sane_speech(msg)
 
     def set_auto_speak(self, msg):
@@ -96,7 +96,7 @@ class MarkovSpeech(BaseModule):
             what_to_say = self.generate_sane_sentence()
             if what_to_say:
                 ModuleLoader().reply_handle.msg(self.auto_talk, self.generate_sane_sentence())
-            elif random.rand(1, 2) == 1:
+            elif random.randrange(1, 2) == 1:
                 return self.auto_speak(msg)
 
         if self.auto_talk and hasattr(self, 'timer_auto_speak'):
