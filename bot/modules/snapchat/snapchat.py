@@ -207,6 +207,8 @@ class Snapchat(object):
 
         if self.auth_token and self.username:
             self.logged_in = True
+        else:
+            print("I AM NOT LOGGED INTO SNAPCHAT")
 
         return result
 
