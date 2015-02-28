@@ -24,7 +24,7 @@ class SnapRelay(BaseModule):
     SNAPCHAT_USERNAME = ""
     SNAPCHAT_PASSWORD = ""
     SNAP_CHANNEL = ""
-    last_check = time.time()
+    last_check = None
 
     # Randomizes timer to timer value + 0..180
     RANDOM_TIMER = 180
@@ -47,6 +47,7 @@ class SnapRelay(BaseModule):
 
     def __init__(self, args):
       super(self.__class__,self).__init__(self)
+      self.last_check = time.time()
       self.initialize_database()
       config = ConfigParser()
       config.read(["settings.ini"])
