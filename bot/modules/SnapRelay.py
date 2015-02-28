@@ -7,7 +7,7 @@ import urllib
 import re
 import sqlite3 as sql
 import random
-import time
+
 from snapchat.snapchat import Snapchat
 import pyimgur
 from pyshorteners.shorteners import Shortener
@@ -147,6 +147,7 @@ class SnapRelay(BaseModule):
 
     def download_snaps(self, s=None, msg=None):
         """Download all snaps that haven't already been downloaded."""
+        import time
         if not s:
           s = self.snapchat_handle
 
