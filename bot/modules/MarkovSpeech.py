@@ -63,8 +63,10 @@ class MarkovSpeech(BaseModule):
         sentence = self.generate_sane_sentence(msg)
         if sentence:
             msg.reply(sentence)
-        elif random.randrange(1,2):
+        elif random.randrange(1,2) == 1:
             return self.sane_speech(msg)
+        else:
+            msg.reply("eh... idk what to say")
 
     def set_auto_speak(self, msg):
         """
@@ -100,13 +102,10 @@ class MarkovSpeech(BaseModule):
                 return self.auto_speak(msg)
 
         if self.auto_talk and hasattr(self, 'timer_auto_speak'):
-            try:
-                self.timer_auto_speak.stop()
-            except:
-                print("Looping Call was not running, starting it ...")
             t = random.randrange(int(self.interval[0]), int(self.interval[1]))
             print("Setting new timer for MarkovSpeech.auto_speak: "+str(t)+" seconds")
-            self.timer_auto_speak.start(t, now=False)
+            self.timer_auto_speak.interval = t
+            self.timer_auto_speak._reschedule()
 
 
     def generate_sentence(self,msg):
