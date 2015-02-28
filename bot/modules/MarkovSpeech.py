@@ -221,7 +221,7 @@ class MarkovSpeech(BaseModule):
         print("Generating sentence based on: "+str(first_word))
         if first_word and second_word:
             cursor.execute("SELECT first_pair, second_pair, (occured_first+ABS(RANDOM()%10000)) as choice FROM pair WHERE first_pair=(SELECT id FROM (SELECT id FROM sequence WHERE first=(SELECT id FROM word WHERE word=?) AND second=(SELECT id FROM word WHERE word=?)) LIMIT 1) ORDER BY choice DESC LIMIT 1;", (first_word, second_word))
-            print("Starting with both a first and second word")
+            print("Starting with both a first and second word: "+first_word+", "+second_word)
         else:
             print("Starting with a first word")
             cursor.execute("SELECT first_pair, second_pair,(occured_first+ABS(RANDOM()%10000)) as choice FROM pair WHERE first_pair=(SELECT id FROM (SELECT id,(occurance*ABS(RANDOM()%10000)) as choice FROM sequence WHERE first=(SELECT id FROM word WHERE word=?) LIMIT 1) ORDER BY choice DESC LIMIT 1) ORDER BY choice DESC LIMIT 1;", (first_word,))
@@ -253,6 +253,7 @@ class MarkovSpeech(BaseModule):
                     print("Got no word pair from this one: " + "SELECT second_pair, (occurance+ABS(RANDOM()%10000)) as choice, occurance, occured_last FROM pair WHERE first_pair = "+pair_id+" ORDER BY choice DESC LIMIT 1")
                     break
 
+            print(sequence_list)
             # Build query to pick out words
             queries = []
             word_order = 0
