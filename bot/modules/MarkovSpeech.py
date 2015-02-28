@@ -63,8 +63,8 @@ class MarkovSpeech(BaseModule):
         sentence = self.generate_sane_sentence(msg)
         if sentence:
             msg.reply(sentence)
-        elif random.randrange(1, 2) == 1:
-            return self.sane_speech(msg)
+        #elif random.randrange(1, 2) == 1:
+        #    return self.sane_speech(msg)
         else:
             msg.reply("eh... idk what to say")
 
