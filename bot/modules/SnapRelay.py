@@ -7,7 +7,7 @@ import urllib
 import re
 import sqlite3 as sql
 import random
-import time
+from time import time
 from snapchat.snapchat import Snapchat
 import pyimgur
 from pyshorteners.shorteners import Shortener
@@ -24,7 +24,7 @@ class SnapRelay(BaseModule):
     SNAPCHAT_USERNAME = ""
     SNAPCHAT_PASSWORD = ""
     SNAP_CHANNEL = ""
-    last_check = None
+    last_check = time()
 
     # Randomizes timer to timer value + 0..180
     RANDOM_TIMER = 180
@@ -46,20 +46,19 @@ class SnapRelay(BaseModule):
     ]
 
     def __init__(self, args):
-      super(self.__class__,self).__init__(self)
-      self.last_check = time.time()
-      self.initialize_database()
-      config = ConfigParser()
-      config.read(["settings.ini"])
-      self.imgur_handle = pyimgur.Imgur(config.get('belle', 'imgur_app_id'))
-      self.IMGUR_APP_ID = config.get('belle', 'imgur_app_id')
-      self.SNAPCHAT_USERNAME = config.get('belle', 'snapchat_username')
-      self.SNAPCHAT_PASSWORD = config.get('belle', 'snapchat_password')
-      self.SNAP_CHANNEL = config.get('belle', 'snap_channel')
-      self.snapchat_handle.login(self.SNAPCHAT_USERNAME,self.SNAPCHAT_PASSWORD)
+        super(self.__class__, self).__init__(self)
+        self.last_check = time()
+        self.initialize_database()
+        config = ConfigParser()
+        config.read(["settings.ini"])
+        self.imgur_handle = pyimgur.Imgur(config.get('belle', 'imgur_app_id'))
+        self.IMGUR_APP_ID = config.get('belle', 'imgur_app_id')
+        self.SNAPCHAT_USERNAME = config.get('belle', 'snapchat_username')
+        self.SNAPCHAT_PASSWORD = config.get('belle', 'snapchat_password')
+        self.SNAP_CHANNEL = config.get('belle', 'snap_channel')
+        self.snapchat_handle.login(self.SNAPCHAT_USERNAME,self.SNAPCHAT_PASSWORD)
 
-
-    def check_for_snaps(self,msg=None):
+    def check_for_snaps(self, msg=None):
       """
       Checks for snaps sent to mirabellezzz and posts a link
       """
@@ -68,14 +67,14 @@ class SnapRelay(BaseModule):
         msg.reply("I don't have any new snaps :(")
 
 
-    def add_friend(self,msg):
+    def add_friend(self, msg):
       """
       Adds a friend on snapchat - add yourself with !friend username to send snaps to mirabellezzz
       """
       self.snapchat_handle.add_friend(msg.clean_contents)
       msg.reply("Added!")
 
-    def gallery_link(self,msg):
+    def gallery_link(self, msg):
       """
       Gets the link to all snaps
       """
@@ -133,8 +132,8 @@ class SnapRelay(BaseModule):
         ext = s.is_media(result)
 
         if ext not in self.EXTENSIONS:
-          print("Skipping {} snap".format(ext))
-          return False
+            print("Skipping {} snap".format(ext))
+            return False
 
         filename = '{}+{}+{}.{}'.format(ts, name, id, ext)
         print "Writing to ", filename
@@ -142,18 +141,17 @@ class SnapRelay(BaseModule):
         with open(path, 'wb') as fout:
             fout.write(result)
 
-
         image = self.imgur_handle.upload_image(path, title="via {user} ({date})".format(user=name, date=datetime.now()), album=self.album_id)
         return image.link or True
 
     def download_snaps(self, s=None, msg=None):
         """Download all snaps that haven't already been downloaded."""
-        import time
-        if not s:
-          s = self.snapchat_handle
 
-        now = time.time()
-        if int(self.last_check-now) < self.RANDOM_TIMER:
+        if not s:
+            s = self.snapchat_handle
+
+        now = time()
+        if int(self.last_check - now) < self.RANDOM_TIMER:
             if msg:
                 msg.reply("Just wait a little bit, I don't want to get banned from SnapChat again")
             return False
@@ -180,11 +178,11 @@ class SnapRelay(BaseModule):
                 print result
             else:
                 if not msg:
-                  loader.reply_handle.msg(self.SNAP_CHANNEL, "{user} just sent me a snap! {url}".format(user=snap['sender'].capitalize(), url=result))
+                    loader.reply_handle.msg(self.SNAP_CHANNEL, "{user} just sent me a snap! {url}".format(user=snap['sender'].capitalize(), url=result))
                 else:
-                  msg.reply("{user} just sent me a snap! {url}".format(user=snap['sender'].capitalize(), url=result))
+                    msg.reply("{user} just sent me a snap! {url}".format(user=snap['sender'].capitalize(), url=result))
                 imgur_id = result.split("/").pop().split(".").pop(0)
-                snaps_to_imgur.append((imgur_id,snap['sender'],snap['time']))
+                snaps_to_imgur.append((imgur_id, snap['sender'], snap['time']))
                 print 'Downloaded:', id
                 print 'Uploading to imgur...'
 
@@ -204,14 +202,14 @@ class SnapRelay(BaseModule):
             print("I should set a random timer, but RANDOM_TIMER is "+str(self.RANDOM_TIMER)+" and timer_download_snaps: "+str(hasattr(self, 'timer_download_snaps')))
 
         if snaps_to_imgur:
-          cursor.executemany("INSERT INTO snap (imgur_id, author, time) VALUES (?,?,?)",snaps_to_imgur)
-          loader.reply_handle.msg(self.SNAP_CHANNEL, ".. into the gallery with all the others :)")
-          self.db.commit()
-          s.clear_feed()
+            cursor.executemany("INSERT INTO snap (imgur_id, author, time) VALUES (?,?,?)", snaps_to_imgur)
+            loader.reply_handle.msg(self.SNAP_CHANNEL, ".. into the gallery with all the others :)")
+            self.db.commit()
+            s.clear_feed()
 
-          return True
+            return True
         else:
-          return False
+            return False
 
     def is_jpeg(self, image_path):
       """Checks if a file is ACTUALLY a jpeg"""
