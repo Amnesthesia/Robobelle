@@ -7,7 +7,7 @@ import urllib
 import re
 import sqlite3 as sql
 import random
-from time import time
+
 from snapchat.snapchat import Snapchat
 import pyimgur
 from pyshorteners.shorteners import Shortener
@@ -24,7 +24,7 @@ class SnapRelay(BaseModule):
     SNAPCHAT_USERNAME = ""
     SNAPCHAT_PASSWORD = ""
     SNAP_CHANNEL = ""
-    last_check = time()
+    last_check = datetime.now()
 
     # Randomizes timer to timer value + 0..180
     RANDOM_TIMER = 180
@@ -47,7 +47,7 @@ class SnapRelay(BaseModule):
 
     def __init__(self, args):
         super(self.__class__, self).__init__(self)
-        self.last_check = time()
+        self.last_check = datetime.now()
         self.initialize_database()
         config = ConfigParser()
         config.read(["settings.ini"])
@@ -150,8 +150,8 @@ class SnapRelay(BaseModule):
         if not s:
             s = self.snapchat_handle
 
-        now = time()
-        if int(self.last_check - now) < self.RANDOM_TIMER:
+        now = datetime.time()
+        if (self.last_check - now).seconds < self.RANDOM_TIMER:
             if msg:
                 msg.reply("Just wait a little bit, I don't want to get banned from SnapChat again")
             return False
