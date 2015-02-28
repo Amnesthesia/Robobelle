@@ -280,6 +280,7 @@ class MarkovSpeech(BaseModule):
             sentence = " ".join(sentence)
             if " ." in sentence:
                 sentence = sentence.replace(" .", ".")
+            return sentence
 
     def raw(self, msg):
         """ Process messages and learn """
