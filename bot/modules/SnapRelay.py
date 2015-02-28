@@ -7,6 +7,7 @@ import urllib
 import re
 import sqlite3 as sql
 import random
+import time
 from snapchat.snapchat import Snapchat
 import pyimgur
 from pyshorteners.shorteners import Shortener
@@ -23,6 +24,7 @@ class SnapRelay(BaseModule):
     SNAPCHAT_USERNAME = ""
     SNAPCHAT_PASSWORD = ""
     SNAP_CHANNEL = ""
+    last_check = time.time()
 
     # Randomizes timer to timer value + 0..180
     RANDOM_TIMER = 180
@@ -147,6 +149,13 @@ class SnapRelay(BaseModule):
         """Download all snaps that haven't already been downloaded."""
         if not s:
           s = self.snapchat_handle
+        if int(self.last_check-time.time()) < self.RANDOM_TIMER:
+            if msg:
+                msg.reply("Just wait a little bit, I don't want to get banned from SnapChat again")
+            return False
+        else:
+            self.last_check = time.time()
+
         existing = self.get_downloaded_snaps()
         cursor = self.db.cursor()
         loader = ModuleLoader()
@@ -180,7 +189,7 @@ class SnapRelay(BaseModule):
                 self.timer_download_snaps.stop()
             except:
                 print("Looping call was not running")
-            
+
             time = [key for key, value in self.timer.items() if value == 'download_snaps']
             if time:
                 t = int(time.pop())
