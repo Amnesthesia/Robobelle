@@ -63,7 +63,7 @@ class MarkovSpeech(BaseModule):
         sentence = self.generate_sane_sentence(msg)
         if sentence:
             msg.reply(sentence)
-        elif random.randrange(1,2) == 1:
+        elif random.randrange(1, 2) == 1:
             return self.sane_speech(msg)
         else:
             msg.reply("eh... idk what to say")
@@ -224,7 +224,7 @@ class MarkovSpeech(BaseModule):
             print("Starting with both a first and second word")
         else:
             print("Starting with a first word")
-            cursor.execute("SELECT first_pair, second_pair,(occured_first+ABS(RANDOM()%10000)) as choice FROM pair WHERE first_pair=(SELECT id FROM (SELECT id,(occurance*ABS(RANDOM()%10000)) as choice FROM sequence WHERE first=(SELECT id FROM word WHERE word=?)) ORDER BY choice DESC LIMIT 1) ORDER BY choice DESC LIMIT 1;", (first_word,))
+            cursor.execute("SELECT first_pair, second_pair,(occured_first+ABS(RANDOM()%10000)) as choice FROM pair WHERE first_pair=(SELECT id FROM (SELECT id,(occurance*ABS(RANDOM()%10000)) as choice FROM sequence WHERE first=(SELECT id FROM word WHERE word=?) LIMIT 1) ORDER BY choice DESC LIMIT 1) ORDER BY choice DESC LIMIT 1;", (first_word,))
 
         sequence_list = []
         pair_id = cursor.fetchone()
