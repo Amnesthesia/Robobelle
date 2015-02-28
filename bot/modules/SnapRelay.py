@@ -149,12 +149,14 @@ class SnapRelay(BaseModule):
         """Download all snaps that haven't already been downloaded."""
         if not s:
           s = self.snapchat_handle
-        if int(self.last_check-time.time()) < self.RANDOM_TIMER:
+
+        now = time.time()
+        if int(self.last_check-now) < self.RANDOM_TIMER:
             if msg:
                 msg.reply("Just wait a little bit, I don't want to get banned from SnapChat again")
             return False
         else:
-            self.last_check = time.time()
+            self.last_check = now
 
         existing = self.get_downloaded_snaps()
         cursor = self.db.cursor()
