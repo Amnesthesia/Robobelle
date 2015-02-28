@@ -275,15 +275,9 @@ class MarkovSpeech(BaseModule):
             for row in rows:
                 sentence.append(row["word"].encode('utf-8'))
 
-            return " ".join(sentence)
-
-
-
-
-    def get_next_pair(self, pair_id):
-        pass
-
-
+            sentence = " ".join(sentence)
+            if " ." in sentence:
+                sentence = sentence.replace(" .", ".")
 
     def raw(self, msg):
         """ Process messages and learn """
