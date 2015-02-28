@@ -151,7 +151,7 @@ class SnapRelay(BaseModule):
             s = self.snapchat_handle
 
         now = datetime.now()
-        if (self.last_check - now).seconds < self.RANDOM_TIMER:
+        if last_check and (self.last_check - now).seconds < self.RANDOM_TIMER:
             if msg:
                 msg.reply("Just wait a little bit, I don't want to get banned from SnapChat again")
             return False
