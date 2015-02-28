@@ -7,7 +7,7 @@ import urllib
 import re
 import sqlite3 as sql
 import random
-
+import time
 from snapchat.snapchat import Snapchat
 import pyimgur
 from pyshorteners.shorteners import Shortener
