@@ -250,6 +250,7 @@ class MarkovSpeech(BaseModule):
                     if break_chance > random.randrange(1,100):
                         break
                 else:
+                    print("Got no word pair from this one: " + "SELECT second_pair, (occurance+ABS(RANDOM()%10000)) as choice, occurance, occured_last FROM pair WHERE first_pair = "+pair_id+" ORDER BY choice DESC LIMIT 1")
                     break
 
             # Build query to pick out words
