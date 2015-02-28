@@ -258,10 +258,11 @@ class MarkovSpeech(BaseModule):
             queries = []
             word_order = 0
             for word_pair in sequence_list:
+                print("Getting words from sequence: "+str(word_pair))
                 word_order += 1
-                queries.append("SELECT word, {order} as ordr FROM word WHERE id=(SELECT first FROM sequence WHERE id={id})".format(id=word_pair, order=word_order))
+                queries.append("SELECT word, {order} as ordr FROM word WHERE id=(SELECT first FROM sequence WHERE id={id})".format(id=int(word_pair), order=word_order))
                 word_order += 1
-                queries.append("SELECT word, {order} as ordr FROM word WHERE id=(SELECT second FROM sequence WHERE id={id})".format(id=word_pair, order=word_order))
+                queries.append("SELECT word, {order} as ordr FROM word WHERE id=(SELECT second FROM sequence WHERE id={id})".format(id=int(word_pair), order=word_order))
 
 
             query = " UNION ".join(queries)
