@@ -159,17 +159,14 @@ class SnapRelay(BaseModule):
             self.last_check = now
 
         if self.RANDOM_TIMER and hasattr(self, 'timer_download_snaps'):
-            try:
-                self.timer_download_snaps.stop()
-            except:
-                print("Looping call was not running")
 
             time = [key for key, value in self.timer.items() if value == 'download_snaps']
             if time:
                 t = int(time.pop())
                 t += random.randrange(1, self.RANDOM_TIMER)
                 print("Setting new timer for SnapRelay: "+str(t)+" seconds")
-                self.timer_download_snaps.start(t, now=False)
+                self.timer_download_snaps.interval = t
+                self.timer_download_snaps._reschedule()
 
         existing = self.get_downloaded_snaps()
         cursor = self.db.cursor()
