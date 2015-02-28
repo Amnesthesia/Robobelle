@@ -253,7 +253,6 @@ class MarkovSpeech(BaseModule):
                     print("Got no word pair from this one: " + "SELECT second_pair, (occurance+ABS(RANDOM()%10000)) as choice, occurance, occured_last FROM pair WHERE first_pair = "+pair_id+" ORDER BY choice DESC LIMIT 1")
                     break
 
-            print(sequence_list)
             # Build query to pick out words
             queries = []
             word_order = 0
@@ -268,6 +267,7 @@ class MarkovSpeech(BaseModule):
             query = " UNION ".join(queries)
 
             query = "SELECT word, ordr FROM ({q}) ORDER BY ordr ASC".format(q=query)
+            print(query)
             cursor.execute(query)
 
             rows = cursor.fetchall()
