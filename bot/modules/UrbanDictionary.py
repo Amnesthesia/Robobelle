@@ -49,7 +49,7 @@ class UrbanDictionary(BaseModule):
         soup = BeautifulSoup(quote)
         print(soup)
 
-        quote = soup.encode('utf-8').strip()
+        quote = soup.text.encode('utf-8').strip()
         quote = quote.replace('\n','')
         quote = quote.replace("document.write('", "")
         quote = quote.replace("More quotes from", "")
