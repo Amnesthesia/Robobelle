@@ -151,7 +151,7 @@ class MarkovSpeech(BaseModule):
 
       cursor = self.db.cursor()
       if first or not wrd:
-        cursor.execute('select (ABS(RANDOM()%10000)*occurance) as choice,w1.word as first_word,w2.word as second_word,occurance from sequence join word as w1 on w1.id=first join word as w2 on w2.id=second ORDER BY first_word=1,choice DESC LIMIT 1;')
+        cursor.execute('select (ABS(RANDOM()%10000)*occurance) as choice,w1.word as first_word,w2.word as second_word,occurance from sequence join word as w1 on w1.id=first join word as w2 on w2.id=second ORDER BY first_word,choice DESC LIMIT 1;')
         result = cursor.fetchone()
         return [result["first_word"].encode('utf-8'),result["second_word"].encode('utf-8')]
       elif wrd and not first:
