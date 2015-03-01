@@ -26,7 +26,6 @@ class UrbanDictionary(BaseModule):
         """
         Searches the encyclopedia of the internet for information
         """
-        msg.reply("Okay one sec, checking the internet for {msg}".format(msg=msg.clean_contents))
         ed_page = self.get_ed_page(urllib.urlencode({"search": msg.clean_contents}))
 
         if ed_page:
