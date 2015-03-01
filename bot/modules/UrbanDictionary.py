@@ -26,6 +26,7 @@ class UrbanDictionary(BaseModule):
         """
         Searches the encyclopedia of the internet for information
         """
+        msg.reply("Okay one sec, checking the internet for {msg}".format(msg=msg.clean_contents))
         ed_page = self.get_ed_page(urllib.urlencode({"search": msg.clean_contents}))
 
         if ed_page:
@@ -65,7 +66,7 @@ class UrbanDictionary(BaseModule):
         p = re.compile('<title>(.+) \- Encyclopedia Dramatica<\/title>')
         paragraph = soup.find('div', {'id': 'bodyContent'}).findChildren('p')
 
-        if 'There is currently no text' in paragraph[0].text.encode('utf-8').strip():
+        if 'There is currently no text' in paragraph[0].text.encode('utf-8').strip() or not soup:
             print("Nope")
             return False
         else:
@@ -76,17 +77,21 @@ class UrbanDictionary(BaseModule):
             url = ""
 
             scanning_paragraphs = 1
+            words = 0
             paragraphs = []
             for t in paragraph:
-                if scanning_paragraphs > 380:
+                if scanning_paragraphs > 380 or words > 55:
+                    if words > 80:
+                        paragraphs[-1] += "..."
                     break
                 if t.text.strip() != u'':
                     paragraphs.append(t.text.encode('utf-8').strip())
-
+                    words += len(t.text.encode('utf-8').strip().split())
                     scanning_paragraphs += len(t.text.encode('utf-8').strip())
 
             short_url_handle = Shortener('GoogleShortener')
             summary = paragraphs
+
             print(page.url)
             try:
                 link = short_url_handle.short(page.url).encode('utf-8')
@@ -94,34 +99,37 @@ class UrbanDictionary(BaseModule):
                 link = page.url
 
             base_url = "/".join(page.url.split('/')[:-1])
-            all_pics = soup.find('div', {'id': 'bodyContent'}).findChild('div', {'class': 'floatright'}).findAll('a', {'class': 'image'})
-
             return_dict = {"title": title, "summary": summary, "url": link}
-            picture = None
-            for picture in all_pics:
-                if "Main_Page" not in picture['href']:
-                    picture = picture["href"]
-                    break
 
-            if picture:
-                picture = base_url+picture
-                picture_page = urllib.urlopen(picture)
-                print(picture)
+            all_pics = soup.find('div', {'id': 'bodyContent'}).findChild('div', {'class': 'floatright'})
 
+            if all_pics:
+                all_pics = all_pics.findAll('a', {'class': 'image'})
+                picture = None
+                for picture in all_pics:
+                    if "Main_Page" not in picture['href']:
+                        picture = picture["href"]
+                        break
 
-                picture_soup = BeautifulSoup(picture_page.read())
-
-                large_pic = picture_soup.find('div', {'id': 'file'}).findChild('a')['href']
-                print(large_pic)
-
-                if not large_pic:
-                    pic_link = short_url_handle.short(picture).encode('utf-8')
-                else:
-                    image = self.imgur_handle.upload_image(url=large_pic, title="from {url}".format(url=link))
-                    pic_link = image.link if image and image.link else short_url_handle.short(picture).encode('utf-8')
+                if picture:
+                    picture = base_url+picture
+                    picture_page = urllib.urlopen(picture)
+                    print(picture)
 
 
-                return_dict["pic_url"] = pic_link
+                    picture_soup = BeautifulSoup(picture_page.read())
+
+                    large_pic = picture_soup.find('div', {'id': 'file'}).findChild('a')['href']
+                    print(large_pic)
+
+                    if not large_pic:
+                        pic_link = short_url_handle.short(picture).encode('utf-8')
+                    else:
+                        image = self.imgur_handle.upload_image(url=large_pic, title="from {url}".format(url=link))
+                        pic_link = image.link if image and image.link else short_url_handle.short(picture).encode('utf-8')
+
+
+                    return_dict["pic_url"] = pic_link
 
             gallery = soup.find('table', {'class': 'gallery'}).findAll('a', {'class': 'image'})
 
