@@ -27,7 +27,8 @@ class UrbanDictionary(BaseModule):
         Searches the encyclopedia of the internet for information
         """
         ed_page = self.get_ed_page(urllib.urlencode({"search": msg.clean_contents}))
-
+        if not ed_page:
+            ed_page = self.get_ed_page(urllib.urlencode({"search": msg.clean_contents}), where="uncyclopedia")
         if ed_page:
             print(ed_page)
             message = ""
@@ -53,32 +54,45 @@ class UrbanDictionary(BaseModule):
             print(ed_page)
             msg.reply("Nothing on the internet about that. I SWAER.")
 
-    def get_ed_page(self, search=""):
+    def get_ed_page(self, search="", where="ed"):
         if search == "":
             return False
-        page = urllib.urlopen("https://encyclopediadramatica.se/index.php?{search}".format(search=search))
+        if where == "ed":
+            search_url = "https://encyclopediadramatica.se/index.php?{search}".format(search=search)
+        else:
+            search_url = "http://uncyclopedia.wikia.com/index.php?title=Special%3ASearch&{search}&go=Go".format(search=search)
+        page = urllib.urlopen(search_url)
 
 
 
         soup = BeautifulSoup(page.read())
         print("https://encyclopediadramatica.se/index.php?{search}".format(search=search))
-        p = re.compile('<title>(.+) \- Encyclopedia Dramatica<\/title>')
-        paragraph = soup.find('div', {'id': 'bodyContent'}).findChildren('p')
+        p = re.compile('<title>(.+) \- (Encyclopedia Dramatica|Uncyclopedia, the content\-free encyclopedia)<\/title>')
 
-        if 'There is currently no text' in paragraph[0].text.encode('utf-8').strip() or not soup:
+        paragraph = soup.find('div', {'id': 'bodyContent'}).findChildren('p')
+        print(paragraph)
+
+        if 'There is currently no text' in paragraph[0].text.encode('utf-8').strip() \
+        or "Create the page" in paragraph[0].text.encode('utf-8').strip()  \
+        or not soup:
             print("Nope")
             return False
         else:
             title = ""
             title = p.findall(str(soup.title))
-            if isinstance(title, list):
-              title = title[0]
+            if isinstance(title, list) and len(title):
+                title = title[0]
+                if isinstance(title, tuple):
+                    title = title[0]
+
+
             url = ""
 
             scanning_paragraphs = 1
             words = 0
             paragraphs = []
             for t in paragraph:
+                print(t)
                 if scanning_paragraphs > 380 or words > 55:
                     if words > 80:
                         paragraphs[-1] += "..."
@@ -97,7 +111,11 @@ class UrbanDictionary(BaseModule):
             except:
                 link = page.url
 
-            base_url = "/".join(page.url.split('/')[:-1])
+
+            if where == "ed":
+                base_url = "/".join(page.url.split('/')[:-1])
+            else:
+                base_url = "/".join(page.url.split('/')[:-2])
             return_dict = {"title": title, "summary": summary, "url": link}
 
             all_pics = soup.find('div', {'id': 'bodyContent'}).findChild('div', {'class': 'floatright'})
@@ -130,30 +148,12 @@ class UrbanDictionary(BaseModule):
 
                     return_dict["pic_url"] = pic_link
 
-            gallery = soup.find('table', {'class': 'gallery'}).findAll('a', {'class': 'image'})
+            gallery = soup.find('table', {'class': 'gallery'})
 
-            gpics = []
-            for gallery_pic in gallery:
+            if gallery:
+                gallery = gallery.findAll('a', {'class': 'image'})
 
-                picture_page = urllib.urlopen(base_url+gallery_pic['href'])
-                picture_soup = BeautifulSoup(picture_page.read())
 
-                large_pic = picture_soup.find('div', {'id': 'file'}).findChild('a')['href']
-                print(large_pic)
-
-                if large_pic:
-                    imgur_link = self.imgur_handle.upload_image(url=large_pic, title="from {url}".format(url=link))
-
-                    imgur_id = imgur_link.link.split("/").pop().split(".").pop(0)
-                    gpics.append(imgur_id)
-
-            if len(gpics):
-                imgur_link = "http://imgur.com/" + ",".join(gpics)
-                print(gpics)
-                try:
-                    return_dict["gallery"] = short_url_handle.short(imgur_link).encode('utf-8')
-                except:
-                    return_dict["gallery"] = imgur_link
 
             return return_dict
 
