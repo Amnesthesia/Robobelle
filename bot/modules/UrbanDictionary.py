@@ -8,7 +8,7 @@ from BaseModule import BaseModule
 
 class UrbanDictionary(BaseModule):
 
-    matchers = { "!ud": "lookup", "!search": "search_ed"}
+    matchers = { "!ud": "lookup", "!search": "search_ed", "!ed": "search_ed", "!un": "search_uncyclopedia"}
 
     def __init__(self, args):
         """
@@ -21,6 +21,38 @@ class UrbanDictionary(BaseModule):
         config = ConfigParser()
         config.read(["settings.ini"])
         self.imgur_handle = pyimgur.Imgur(config.get('belle', 'imgur_app_id'))
+
+    def search_uncyclopedia(self, msg):
+        """
+        Searches uncyclopedia
+        """
+        ed_page = self.get_ed_page(urllib.urlencode({"search": msg.clean_contents}), where="uncyclopedia")
+        if not ed_page:
+            ed_page = self.get_ed_page(urllib.urlencode({"search": msg.clean_contents}))
+        if ed_page:
+            print(ed_page)
+            message = ""
+            if ed_page["title"].capitalize() in ed_page["summary"][0]:
+                ed_page["summary"][0] = ed_page["summary"][0].replace(ed_page["title"].capitalize(), "\x02"+ed_page["title"].capitalize()+"\x02")
+            elif ed_page["title"] in ed_page["summary"][0]:
+                ed_page["summary"][0] = ed_page["summary"][0].replace(ed_page["title"], "\x02"+ed_page["title"]+"\x02")
+            else:
+                msg.reply("\x02{title}\x02".format(title=ed_page["title"]))
+
+            for paragraph in ed_page["summary"]:
+                msg.reply("{summary}".format(summary=paragraph))
+
+            if "pic_url" in ed_page:
+                message += "\x02[Pic: {pic} ]".format(pic=ed_page["pic_url"])
+
+            if "gallery" in ed_page:
+                message += "\x02[Gallery: {gallery}]\x02".format(gallery=ed_page["gallery"])
+
+            message += " \x02[Read more: {url}]\x02".format(url=ed_page["url"])
+            msg.reply(message)
+        else:
+            print(ed_page)
+            msg.reply("Nothing on the internet about that. I SWAER.")
 
     def search_ed(self, msg):
         """
