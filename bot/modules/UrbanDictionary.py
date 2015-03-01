@@ -30,7 +30,7 @@ class UrbanDictionary(BaseModule):
 
         if ed_page:
             print(ed_page)
-
+            message = ""
             if ed_page["title"].capitalize() in ed_page["summary"][0]:
                 ed_page["summary"][0] = ed_page["summary"][0].replace(ed_page["title"].capitalize(), "\x02"+ed_page["title"].capitalize()+"\x02")
             elif ed_page["title"] in ed_page["summary"][0]:
@@ -42,9 +42,13 @@ class UrbanDictionary(BaseModule):
                 msg.reply("{summary}".format(summary=paragraph))
 
             if "pic_url" in ed_page:
-                msg.reply("\x02[Pic: {pic} ] [Read more: {url}]\x02".format(url=ed_page["url"], pic=ed_page["pic_url"]))
-            else:
-                msg.reply("\x02[Read more:\x02 {url}]".format(url=ed_page["url"]))
+                message += "\x02[Pic: {pic} ]".format(pic=ed_page["pic_url"])
+
+            if "gallery" in ed_page:
+                message += "\x02[Gallery: {gallery}]\x02".format(gallery=ed_page["gallery"])
+
+            message += " \x02[Read more: {url}]\x02".format(url=ed_page["url"])
+            msg.reply(message)
         else:
             print(ed_page)
             msg.reply("Nothing on the internet about that. I SWAER.")
@@ -74,13 +78,12 @@ class UrbanDictionary(BaseModule):
             scanning_paragraphs = 1
             paragraphs = []
             for t in paragraph:
+                if scanning_paragraphs > 380:
+                    break
                 if t.text.strip() != u'':
                     paragraphs.append(t.text.encode('utf-8').strip())
 
                     scanning_paragraphs += len(t.text.encode('utf-8').strip())
-
-                    if scanning_paragraphs > 300:
-                        break
 
             short_url_handle = Shortener('GoogleShortener')
             summary = paragraphs
@@ -89,9 +92,11 @@ class UrbanDictionary(BaseModule):
                 link = short_url_handle.short(page.url).encode('utf-8')
             except:
                 link = page.url
-                
+
+            base_url = "/".join(page.url.split('/')[:-1])
             all_pics = soup.find('div', {'id': 'bodyContent'}).findChild('div', {'class': 'floatright'}).findAll('a', {'class': 'image'})
 
+            return_dict = {"title": title, "summary": summary, "url": link}
             picture = None
             for picture in all_pics:
                 if "Main_Page" not in picture['href']:
@@ -99,7 +104,7 @@ class UrbanDictionary(BaseModule):
                     break
 
             if picture:
-                picture = "/".join(page.url.split('/')[:-1])+picture
+                picture = base_url+picture
                 picture_page = urllib.urlopen(picture)
                 print(picture)
 
@@ -116,9 +121,34 @@ class UrbanDictionary(BaseModule):
                     pic_link = image.link if image and image.link else short_url_handle.short(picture).encode('utf-8')
 
 
-                return {"title": title, "summary": summary, "url": link, "pic_url": pic_link}
+                return_dict["pic_url"] = pic_link
 
-            return {"title": title, "summary": summary, "url": link}
+            gallery = soup.find('table', {'class': 'gallery'}).findAll('a', {'class': 'image'})
+
+            gpics = []
+            for gallery_pic in gallery:
+
+                picture_page = urllib.urlopen(base_url+gallery_pic['href'])
+                picture_soup = BeautifulSoup(picture_page.read())
+
+                large_pic = picture_soup.find('div', {'id': 'file'}).findChild('a')['href']
+                print(large_pic)
+
+                if large_pic:
+                    imgur_link = self.imgur_handle.upload_image(url=large_pic, title="from {url}".format(url=link))
+
+                    imgur_id = imgur_link.link.split("/").pop().split(".").pop(0)
+                    gpics.append(imgur_id)
+
+            if len(gpics):
+                imgur_link = "http://imgur.com/" + ",".join(gpics)
+                print(gpics)
+                try:
+                    return_dict["gallery"] = short_url_handle.short(imgur_link).encode('utf-8')
+                except:
+                    return_dict["gallery"] = imgur_link
+
+            return return_dict
 
 
 
