@@ -47,6 +47,7 @@ class UrbanDictionary(BaseModule):
         quote = urllib2.Request("http://www.quotedb.com/quote/quote.php?action=random_quote&c[69]=69&c[44]=44&c[40]=40&c[121]=121&c[80]=80&c[48]=48&c[13]=13&c[6]=6&c[45]=45&c[91]=91&c[115]=115&c[74]=74&c[101]=101&c[43]=43&c[5]=5&c[11]=11&c[62]=62&c[20]=20&c[109]=109&c[84]=84&c[71]=71&c[15]=15&c[73]=73&c[51]=51&c[33]=33&c[64]=64&c[32]=32", headers={'User-Agent': 'Magic Browser'})
         quote = urllib2.urlopen(quote)
         soup = BeautifulSoup(quote)
+        print(soup)
 
         quote = soup.find('p').text.encode('utf-8').strip()
         quote = quote.replace('\n','')
