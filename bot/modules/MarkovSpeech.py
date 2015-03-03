@@ -151,13 +151,13 @@ class MarkovSpeech(BaseModule):
 
       cursor = self.db.cursor()
       if first or not wrd:
-        cursor.execute('select (ABS(RANDOM()%10000)*occurance) as choice,w1.word as first_word,w2.word as second_word,occurance from sequence join word as w1 on w1.id=first join word as w2 on w2.id=second ORDER BY first_word,choice DESC LIMIT 1;')
+        cursor.execute('SELECT choice, first_word, second_word, occurance FROM (select (ABS(RANDOM()%10000)*occurance) as choice,w1.word as first_word,w2.word as second_word,occurance from sequence join word as w1 on w1.id=first join word as w2 on w2.id=second WHERE first_word=1) ORDER BY choice DESC LIMIT 1;')
         result = cursor.fetchone()
         return [result["first_word"].encode('utf-8'),result["second_word"].encode('utf-8')]
       elif wrd and not first:
-        cursor.execute("select (ABS(RANDOM()%10000)*occurance) as choice,w1.word,w2.word as wrd,occurance from sequence join word as w1 on w1.id=first join word as w2 on w2.id=second WHERE w1.word=? ORDER BY choice DESC LIMIT 1;",(wrd,))
+        cursor.execute("SELECT choice, word, wrd, occurance FROM (select (ABS(RANDOM()%10000)*occurance) as choice,w1.word,w2.word as wrd,occurance from sequence join word as w1 on w1.id=first join word as w2 on w2.id=second WHERE w1.word=? ORDER BY choice DESC) ORDER BY choice DESC LIMIT 1;",(wrd,))
       else:
-        cursor.execute("select (ABS(RANDOM()%10000)*occurance) as choice,w1.word,w2.word as wrd,occurance from sequence join word as w1 on w1.id=first join word as w2 on w2.id=second WHERE w1.word=? ORDER BY choice DESC LIMIT 1;",(wrd,))
+        cursor.execute("SELECT choice, word, wrd, occurance FROM (select (ABS(RANDOM()%10000)*occurance) as choice,w1.word,w2.word as wrd,occurance from sequence join word as w1 on w1.id=first join word as w2 on w2.id=second WHERE w1.word=? ORDER BY choice DESC) ORDER BY choice DESC LIMIT 1;",(wrd,))
 
       result = cursor.fetchone()
       if result:
