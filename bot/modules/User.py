@@ -215,16 +215,16 @@ class User(BaseModule):
         elif difference.seconds < 7200:
           return "an hour or so ago"
         elif difference.seconds < 86400:
-          return str(difference.seconds/3600) + " hours ago"
+          return "{0:.2f}".format(difference.seconds/3600) + " hours ago"
       if difference.days == 1:
         return "yesterday"
       if difference.days < 7:
-        return str(difference.days) + " days ago"
+        return "{0:.2f}".format(difference.days) + " days ago"
       if difference.days < 31:
-        return str(difference.days/7) + " weeks, " + str(difference.days % 7) + " days ago"
+        return "{0:.2f}".format(difference.days/7) + " weeks, " + str(difference.days % 7) + " days ago"
       if difference.days < 365:
-        return str(difference.days/30) + " months, " + str(difference.days % 30) + " days ago"
-      return str(difference.days/365) + " years ago"
+        return "{0:.2f}".format(difference.days/30) + " months, " + "{0:.2f}".format(difference.days % 30) + " days ago"
+      return "{0:.2f}".format(difference.days/365) + " years ago"
 
     def initialize_database(self):
       cursor = self.db.cursor()
