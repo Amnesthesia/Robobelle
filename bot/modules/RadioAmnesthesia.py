@@ -84,7 +84,7 @@ class RadioAmnesthesia(BaseModule):
                 print("Alright, got "+title+" aka "+artist+" / "+track)
                 # If the track has changed, write it in the channel
                 if track != self.current_song and self.RADIO_ACTIVE:
-                    ModuleLoader().reply_handle.msg(self.CHANNEL, "Now playing: \x02{artist}\x02 - \x02{track}\x02 [url]".format(artist=artist, track=track, url=self.RADIO_STREAM))
+                    ModuleLoader().reply_handle.msg(self.CHANNEL, "Now playing: \x02{artist}\x02 - \x02{track}\x02 [{url}]".format(artist=artist, track=track, url=self.RADIO_STREAM))
                     self.auto_printed = True
                 else:
                     self.auto_printed = False
